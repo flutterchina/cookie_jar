@@ -16,6 +16,6 @@ dev_dependencies:
   dart_codecov_generator:
     git:
       url: "https://github.com/wendux/dart-codecov.git"
-  dartdoc:
-      git:
-        url: "https://github.com/wendux/dartdoc"
+#  dartdoc:
+#      git:
+#        url: "https://github.com/wendux/dartdoc"
