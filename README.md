@@ -11,7 +11,7 @@ A cookie manager for http requests in Dart, by which you can deal with the compl
 
 ```yaml
 dependencies:
-  dio: ^0.0.1
+  dio: ^0.0.2
 ```
 
 ## Usage
