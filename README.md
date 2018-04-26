@@ -1,7 +1,7 @@
 # CookieJar
 
 [![build statud](https://img.shields.io/travis/flutterchina/cookie_jar/master.svg?style=flat-square)](https://travis-ci.org/flutterchina/cookie_jar)
-[![Pub](https://img.shields.io/pub/v/box2d.svg?style=flat-square)](https://pub.dartlang.org/packages/cookie_jar)
+[![Pub](https://img.shields.io/pub/v/cookie_jar.svg?style=flat-square)](https://pub.dartlang.org/packages/cookie_jar)
 [![coverage](https://img.shields.io/codecov/c/github/flutterchina/cookie_jar/master.svg?style=flat-square)](https://codecov.io/github/flutterchina/cookie_jar?branch=master)
 [![support](https://img.shields.io/badge/platform-flutter%7Cdart%20vm-ff69b4.svg?style=flat-square)](https://github.com/flutterchina/cookie_jar)
 
@@ -66,7 +66,7 @@ If `withDomainSharedCookie` is `true `  ,  will delete the domain-shared cookies
 
 *Note: This API is only available in `PersistCookieJar` class.*
 
-## Work with `HttpClient`
+## Working with `HttpClient`
 
 Using  `DefaultCookieJar` or `PersistCookieJar` manages  `HttpClient ` 's  request/response cookies is very easy:
 
@@ -79,7 +79,7 @@ response= await request.close();
 cj.saveFromResponse(uri, response.cookies);
 ```
 
-## Work with dio
+## Working with dio
 
 [dio](https://github.com/flutterchina/dio) is a powerful Http client for Dart, which supports Interceptors, Global configuration, FormData, File downloading, Timeout etc.  And [dio](https://github.com/flutterchina/dio) supports to manage cookies with cookie_jar, the simple example is:
 
