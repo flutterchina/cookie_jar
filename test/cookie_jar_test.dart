@@ -21,7 +21,7 @@ void main() async {
   await dir.create();
   group('read and save', () {
     test("DefaultCookieJar",() async{
-      var cj=new DefaultCookieJar();
+      var cj=new CookieJar();
       cj.saveFromResponse(Uri.parse("https://www.baidu.com/xx"), cookies);
       List<Cookie> results=cj.loadForRequest(Uri.parse("https://www.baidu.com/xx"));
       expect(results.length, 2);
@@ -39,7 +39,7 @@ void main() async {
     });
 
     test("SharedCookie",() async{
-      var cj=new DefaultCookieJar();
+      var cj=new CookieJar();
       List<Cookie> cookies=[
         new Cookie("name","wendux")..domain=".facebook.com",
         new Cookie("location","china")..domain="qq.com",

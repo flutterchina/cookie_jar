@@ -11,13 +11,22 @@ import 'package:cookie_jar/src/SerializableCookie.dart';
 class PersistCookieJar extends DefaultCookieJar {
   List<String> _cookieDomains;
   String _dir;
+  static final  _dirMaps= new  Map<String,PersistCookieJar>();
 
   /// [dir] where the cookie files saved in, it must be a directory.
-  PersistCookieJar([String dir = './']) {
+  factory PersistCookieJar([String dir = './.cookies/']){
     if (!dir.endsWith("/")) {
       dir += "/";
     }
-    _dir = dir;
+    var directory= new Directory(dir);
+    if(!directory.existsSync()){
+      directory.createSync(recursive: true);
+    }
+   _dirMaps[dir]??=new PersistCookieJar._init(dir);
+    return _dirMaps[dir];
+  }
+
+  PersistCookieJar._init(this._dir) {
     var file = new File('$_dir.domains');
     if (file.existsSync()) {
       try {

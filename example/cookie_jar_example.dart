@@ -14,7 +14,7 @@ void main() async {
   ];
   var dir = new Directory("./example/.cookies");
   await dir.create(recursive: true);
-  var cj = new DefaultCookieJar();
+  var cj = new CookieJar();
   //var cj=new PersistCookieJar("./example/.cookies");
   cj.saveFromResponse(Uri.parse("https://www.baidu.com/xx"), cookies);
   List<Cookie> results = cj.loadForRequest(

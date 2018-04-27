@@ -7,8 +7,7 @@ import 'package:cookie_jar/src/SerializableCookie.dart';
  * cookie policy declared in RFC. [DefaultCookieJar] saves the cookies in RAM, so if the application
  * exit, all cookies will be cleared.
  */
-class DefaultCookieJar extends CookieJar {
-
+class DefaultCookieJar implements CookieJar {
   /// A array to save cookies.
   ///
   /// [domains[0]] save the cookies with "domain" attribute.

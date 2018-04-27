@@ -5,7 +5,7 @@ import 'dart:io';
  * Because the `Cookie` class doesn't  support Json serialization,
  * for the sake of persistence, we use this class instead of it.
  */
-class SerializableCookie {
+class SerializableCookie  {
   SerializableCookie(Cookie this.cookie) {
     createTimeStamp =
         (new DateTime.now().millisecondsSinceEpoch ~/ 1000).toInt();

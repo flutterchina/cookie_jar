@@ -36,9 +36,9 @@ void main() async {
 
 ## Classes
 
-### `DefaultCookieJar`
+### `CookieJar`
 
-`DefaultCookieJar` is a default cookie manager which implements the standard cookie policy declared in RFC. DefaultCookieJar saves the cookies in **RAM**, so if the application exit, all cookies will be cleared.
+`CookieJar` is a default cookie manager which implements the standard cookie policy declared in RFC. CookieJar saves the cookies in **RAM**, so if the application exit, all cookies will be cleared.
 
 ### `PersistCookieJar`
 
@@ -68,10 +68,10 @@ If `withDomainSharedCookie` is `true `  ,  will delete the domain-shared cookies
 
 ## Working with `HttpClient`
 
-Using  `DefaultCookieJar` or `PersistCookieJar` manages  `HttpClient ` 's  request/response cookies is very easy:
+Using  `CookieJar` or `PersistCookieJar` manages  `HttpClient ` 's  request/response cookies is very easy:
 
 ```dart
-var cj=new DefaultCookieJar();
+var cj=new CookieJar();
 ...
 request= await httpClient.openUrl(options.method, uri);
 request.cookies.addAll(cj.loadForRequest(uri));

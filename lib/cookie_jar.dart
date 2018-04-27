@@ -6,7 +6,6 @@ library cookie_jar;
 
 export 'src/CookieJar.dart';
 export 'src/SerializableCookie.dart';
-export 'src/DefaultCookieJar.dart';
 export 'src/PersistCookieJar.dart';
 
 
