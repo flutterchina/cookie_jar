@@ -21,13 +21,11 @@ A simple usage example:
 ```dart
 import 'package:cookie_jar/cookie_jar.dart';
 void main() async {
-  List<Cookie> cookies = [
-    new Cookie("name", "wendux")
-    new Cookie("location", "china")
-  ];
-    
-  var cj = new DefaultCookieJar();
+  List<Cookie> cookies = [new Cookie("name", "wendux"),new Cookie("location", "china")];
+  var cj = new CookieJar();
+  //Save cookies   
   cj.saveFromResponse(Uri.parse("https://www.baidu.com/"), cookies);
+  //Get cookies  
   List<Cookie> results = cj.loadForRequest(Uri.parse("https://www.baidu.com/xx"));
   print(results);  
 }    
@@ -36,17 +34,37 @@ void main() async {
 
 ## Classes
 
+### `SerializableCookie`
+
+This class is a wrapper for `Cookie` class. Because the `Cookie` class doesn't  support Json serialization, for the sake of persistence, we use this class instead of it.
+
 ### `CookieJar`
 
-`CookieJar` is a default cookie manager which implements the standard cookie policy declared in RFC. CookieJar saves the cookies in **RAM**, so if the application exit, all cookies will be cleared.
+`CookieJar` is a default cookie manager which implements the standard cookie policy declared in RFC. CookieJar saves the cookies in **RAM**, so if the application exit, all cookies will be cleared. A example as follow:
+
+```dart
+var cj= new CookieJar();
+```
 
 ### `PersistCookieJar`
 
-`PersistCookieJar` is a cookie manager which implements the standard cookie policy declared in RFC. `PersistCookieJar`  persists the cookies in files, so if the application exit, the cookies always exist unless call `delete` explicitly.
+`PersistCookieJar` is a cookie manager which implements the standard cookie policy declared in RFC. `PersistCookieJar`  persists the cookies in files, so if the application exit, the cookies always exist unless call `delete` explicitly. A example as follows:
 
-### `SerializableCookie` 
+```dart
+// Cookie files will be saved in "./cookies"
+var cj=new PersistCookieJar("./cookies");
+```
 
-This class is a wrapper for `Cookie` class. Because the `Cookie` class doesn't  support Json serialization, for the sake of persistence, we use this class instead of it.
+> **Note**: In Flutter, File system is different from PC,  you can use [path_provider](https://pub.dartlang.org/packages/path_provider) package to get the path :
+>
+> ```dart
+> // API `getTemporaryDirectory` is from "path_provider" package.
+> Directory tempDir = await getTemporaryDirectory();
+> String tempPath = tempDir.path;
+> CookieJar cj=new PersistCookieJar(tempPath);
+> ```
+
+
 
 ## APIs
 
