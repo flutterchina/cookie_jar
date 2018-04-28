@@ -99,11 +99,6 @@ void main() async {
       results=cj.loadForRequest(Uri.parse("https://www.baidu.com/"));
       expect(results.length, 0);
       results=cj.loadForRequest(Uri.parse("https://google.com"));
-      expect(results.length, 1);
-      await new Future.delayed(new Duration(seconds: 2),(){
-        results=cj.loadForRequest(Uri.parse("https://google.com"));
-        expect(results.length, 1);
-      });
     });
   });
 }
