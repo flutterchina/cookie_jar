@@ -91,7 +91,7 @@ void main() async {
     });
 
     test("PersistCookieJarLoad",() async{
-      var cj=new PersistCookieJar("./cookies");
+      var cj=new PersistCookieJar("./test/cookies");
       List<Cookie> results=cj.loadForRequest(Uri.parse("https://www.baidu.com/xx"));
       expect(results.length, 2);
       results=cj.loadForRequest(Uri.parse("https://www.baidu.com/xx/dd"));
