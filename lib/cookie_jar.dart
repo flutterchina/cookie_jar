@@ -4,8 +4,6 @@
 /// A open source project authorized by [https://flutterchina.club](https://flutterchina.club).
 library cookie_jar;
 
-export 'src/CookieJar.dart';
-export 'src/SerializableCookie.dart';
-export 'src/PersistCookieJar.dart';
-
-
+export 'src/cookie_jar.dart';
+export 'src/persist_cookie_jar.dart';
+export 'src/serializable_cookie.dart';
