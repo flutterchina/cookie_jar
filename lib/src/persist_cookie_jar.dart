@@ -29,26 +29,32 @@ class PersistCookieJar extends DefaultCookieJar {
     File file = new File('$_dir.domains');
     if (file.existsSync()) {
       try {
-        domains[0] = json.decode(file.readAsStringSync());
-        domains[0].forEach((String domain, Map<String, Map<String, dynamic>> cookies) {
-          cookies.forEach((String path, Map<String, dynamic> map) {
-            map.forEach((String k, dynamic v) {
-              map[k] = new SerializableCookie.fromJson(v);
-            });
-          });
-        });
+        final Map<String, Map<String, Map<String, dynamic>>> map =
+            json.decode(file.readAsStringSync()).cast<String, Map<String, dynamic>>()
+              ..forEach((String domain, Map<String, Map<String, dynamic>> cookies) {
+                cookies.forEach((String path, Map<String, dynamic> map) {
+                  map.forEach((String k, dynamic v) {
+                    map[k] = new SerializableCookie.fromJson(v);
+                  });
+                });
+              });
+
+        domains[0] = map;
       } catch (e) {
         file.delete();
+        rethrow;
       }
     }
     if (_cookieDomains == null) {
       file = new File('$_dir.index');
       if (file.existsSync()) {
         try {
-          _cookieDomains = json.decode(file.readAsStringSync());
+          final List<dynamic> list = json.decode(file.readAsStringSync());
+          _cookieDomains = list.cast<String>();
           return;
         } catch (e) {
           file.delete();
+          rethrow;
         }
       }
     }
@@ -148,15 +154,16 @@ class PersistCookieJar extends DefaultCookieJar {
       if (file.existsSync()) {
         Map<String, Map<String, dynamic>> cookies;
         try {
-          cookies = json.decode(file.readAsStringSync());
+          cookies = json.decode(file.readAsStringSync()).cast<String, Map<String, dynamic>>();
           cookies.forEach((String path, Map<String, dynamic> map) {
             map.forEach((String k, dynamic v) {
               map[k] = new SerializableCookie.fromJson(v);
             });
           });
-          domains[1][host] = cookies;
+          domains[1][host] = cookies.cast<String, Map<String, SerializableCookie>>();
         } catch (e) {
           file.delete();
+          rethrow;
         }
       }
     }
