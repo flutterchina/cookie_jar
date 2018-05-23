@@ -47,19 +47,24 @@ class DefaultCookieJar implements CookieJar {
     });
     // Load cookies without "domain" attribute, include port.
     final String hostname = '${uri.host}${uri.port}';
-    domains[1].forEach((String domain, Map<String, Map<String, SerializableCookie>> cookies) {
+
+    for (String domain in domains[1].keys) {
       if (hostname == domain) {
-        cookies.forEach((String path, Map<String, SerializableCookie> values) {
+        final Map<String, Map<String, dynamic>> cookies = domains[1][domain].cast<String, Map<String, dynamic>>();
+
+        for (String path in cookies.keys) {
           if (urlPath.contains(path)) {
-            values.forEach((String key, SerializableCookie v) {
-              if (_check(uri.scheme, v)) {
-                list.add(v.cookie);
+            final Map<String, dynamic> values = cookies[path];
+            for (String key in values.keys) {
+              final SerializableCookie cookie = values[key];
+              if (_check(uri.scheme, cookie)) {
+                list.add(cookie.cookie);
               }
-            });
+            }
           }
-        });
+        }
       }
-    });
+    }
     return list;
   }
 
@@ -73,6 +78,7 @@ class DefaultCookieJar implements CookieJar {
           domain = domain.substring(1);
         }
         final String path = cookie.path ?? '/';
+
         final Map<String, Map<String, SerializableCookie>> mapDomain =
             domains[0][domain] ?? <String, Map<String, SerializableCookie>>{};
         final Map<String, SerializableCookie> map = mapDomain[path] ?? <String, SerializableCookie>{};
@@ -83,12 +89,14 @@ class DefaultCookieJar implements CookieJar {
         // Save cookies without "domain" attribute, include port.
         final String path = cookie.path ?? (uri.path.isEmpty ? '/' : uri.path);
         final String domain = '${uri.host}${uri.port}';
-        final Map<String, Map<String, SerializableCookie>> mapDomain =
-            domains[1][domain] ?? <String, Map<String, SerializableCookie>>{};
-        final Map<String, SerializableCookie> map = mapDomain[path] ?? <String, SerializableCookie>{};
+
+        Map<String, Map<String, dynamic>> mapDomain = domains[1][domain] ?? <String, Map<String, dynamic>>{};
+        mapDomain = mapDomain.cast<String, Map<String, dynamic>>();
+
+        final Map<String, dynamic> map = mapDomain[path] ?? <String, dynamic>{};
         map[cookie.name] = new SerializableCookie(cookie);
-        mapDomain[path] = map;
-        domains[1][domain] = mapDomain;
+        mapDomain[path] = map.cast<String, SerializableCookie>();
+        domains[1][domain] = mapDomain.cast<String, Map<String, SerializableCookie>>();
       }
     }
   }

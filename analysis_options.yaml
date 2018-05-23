@@ -1,7 +1,8 @@
 analyzer:
   language:
     enableSuperMixins: true
-  strong-mode: true
+  strong-mode:
+      implicit-dynamic: false
   errors:
     missing_required_param: error
     missing_return: error
