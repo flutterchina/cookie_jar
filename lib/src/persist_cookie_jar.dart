@@ -10,7 +10,8 @@ import 'package:cookie_jar/src/serializable_cookie.dart';
 class PersistCookieJar extends DefaultCookieJar {
   List<String> _cookieDomains;
   String _dir;
-  static final Map<String, PersistCookieJar> _dirMaps = <String, PersistCookieJar>{};
+  static final Map<String, PersistCookieJar> _dirMaps =
+  <String, PersistCookieJar>{};
 
   /// [dir] where the cookie files saved in, it must be a directory.
   factory PersistCookieJar([String dir = './.cookies/']) {
@@ -29,23 +30,33 @@ class PersistCookieJar extends DefaultCookieJar {
     File file = new File('$_dir.domains');
     if (file.existsSync()) {
       try {
-        final Map<String, dynamic> jsonData = json.decode(file.readAsStringSync());
+        final Map<String, dynamic> jsonData = json.decode(
+            file.readAsStringSync());
 
-        final Map<String, Map<String, Map<String, SerializableCookie>>> cookies = jsonData.map((String domain, dynamic _cookies) {
+        final Map<String,
+            Map<String, Map<String, SerializableCookie>>> cookies = jsonData
+            .map((String domain, dynamic _cookies) {
           final Map<String, dynamic> cookies = _cookies.cast<String, dynamic>();
-          final Map<String, Map<String, SerializableCookie>> domainCookies = cookies.map((String path, dynamic map) {
-            final Map<String, String> cookieForPath = map.cast<String, String>();
-            final Map<String, SerializableCookie> realCookies = cookieForPath.map((String cookieName, String cookie) =>
-                new MapEntry<String, SerializableCookie>(cookieName, new SerializableCookie.fromJson(cookie)));
-            return new MapEntry<String, Map<String, SerializableCookie>>(path, realCookies);
+          final Map<String,
+              Map<String, SerializableCookie>> domainCookies = cookies.map((
+              String path, dynamic map) {
+            final Map<String, String> cookieForPath = map.cast<String,
+                String>();
+            final Map<String, SerializableCookie> realCookies = cookieForPath
+                .map((String cookieName, String cookie) =>
+            new MapEntry<String, SerializableCookie>(
+                cookieName, new SerializableCookie.fromJson(cookie)));
+            return new MapEntry<String, Map<String, SerializableCookie>>(
+                path, realCookies);
           });
-          return new MapEntry<String, Map<String, Map<String, SerializableCookie>>>(domain, domainCookies);
+          return new MapEntry<String,
+              Map<String, Map<String, SerializableCookie>>>(
+              domain, domainCookies);
         });
 
         domains[0] = cookies;
       } catch (e) {
-        //file.delete();
-        rethrow;
+        file.delete();
       }
     }
     if (_cookieDomains == null) {
@@ -56,8 +67,7 @@ class PersistCookieJar extends DefaultCookieJar {
           _cookieDomains = list.cast<String>();
           return;
         } catch (e) {
-          //file.delete();
-          rethrow;
+          file.delete();
         }
       }
     }
@@ -82,18 +92,23 @@ class PersistCookieJar extends DefaultCookieJar {
     }
   }
 
-  Map<String, Map<String, SerializableCookie>> _filter(Map<String, Map<String, SerializableCookie>> domain,
+  Map<String, Map<String, SerializableCookie>> _filter(
+      Map<String, Map<String, SerializableCookie>> domain,
       [bool keepSession = true]) {
-    return domain.cast<String, Map<String, dynamic>>().map((String path, Map<String, dynamic> _cookies) {
-      final Map<String, SerializableCookie> cookies = _cookies.map((String cookieName, dynamic cookie) {
-        if (((cookie.cookie.expires == null && cookie.cookie.maxAge == null) && keepSession) || !cookie.isExpired()) {
+    return domain.cast<String, Map<String, dynamic>>().map((String path,
+        Map<String, dynamic> _cookies) {
+      final Map<String, SerializableCookie> cookies = _cookies.map((
+          String cookieName, dynamic cookie) {
+        if (((cookie.cookie.expires == null && cookie.cookie.maxAge == null) &&
+            keepSession) || !cookie.isExpired()) {
           return new MapEntry<String, SerializableCookie>(cookieName, cookie);
         } else
           return new MapEntry<String, SerializableCookie>(null, cookie);
       })
         ..removeWhere((String k, SerializableCookie v) => k == null);
 
-      return new MapEntry<String, Map<String, SerializableCookie>>(path, cookies);
+      return new MapEntry<String, Map<String, SerializableCookie>>(
+          path, cookies);
     });
   }
 
@@ -114,17 +129,23 @@ class PersistCookieJar extends DefaultCookieJar {
       file.delete();
     }
     if (withDomainSharedCookie) {
-      final Map<String, Map<String, Map<String, SerializableCookie>>> newSharedCookies =
-          <String, Map<String, Map<String, SerializableCookie>>>{};
-      domains[0].forEach((String domain, Map<String, Map<String, SerializableCookie>> key) {
-        if (!uri.host.contains(domain)) {
-          newSharedCookies[domain] = key;
-        }
-      });
-      domains[0] = newSharedCookies;
+      domains[0].removeWhere((String domain,
+          Map<String, Map<String, SerializableCookie>>v) =>
+          uri.host.contains(domain));
       file = new File('$_dir.domains');
       file.writeAsStringSync(json.encode(domains[0]));
     }
+  }
+
+
+  /// Delete all cookies files under [dir] directory and clear them out from RAM
+  void deleteAll() {
+    Directory directory = new Directory(_dir);
+    if (directory.existsSync()) {
+      directory.deleteSync(recursive: true);
+    }
+    _cookieDomains?.clear();
+    _dirMaps.remove(_dir);
   }
 
   void _save(Uri uri, [bool withDomainSharedCookie = false]) {
@@ -141,9 +162,11 @@ class PersistCookieJar extends DefaultCookieJar {
     }
     if (withDomainSharedCookie) {
       file = new File('$_dir.domains');
-      final Map<String, Map<String, Map<String, SerializableCookie>>> newDomains =
-          <String, Map<String, Map<String, SerializableCookie>>>{};
-      domains[0].forEach((String domain, Map<String, Map<String, SerializableCookie>> map) {
+      final Map<String,
+          Map<String, Map<String, SerializableCookie>>> newDomains =
+      <String, Map<String, Map<String, SerializableCookie>>>{};
+      domains[0].forEach((String domain,
+          Map<String, Map<String, SerializableCookie>> map) {
         newDomains[domain] = _filter(map);
       });
       file.writeAsStringSync(json.encode(newDomains));
@@ -157,16 +180,18 @@ class PersistCookieJar extends DefaultCookieJar {
       if (file.existsSync()) {
         Map<String, Map<String, dynamic>> cookies;
         try {
-          cookies = json.decode(file.readAsStringSync()).cast<String, Map<String, dynamic>>();
+          cookies = json.decode(file.readAsStringSync()).cast<String,
+              Map<String, dynamic>>();
           cookies.forEach((String path, Map<String, dynamic> map) {
             map.forEach((String k, dynamic v) {
               map[k] = new SerializableCookie.fromJson(v);
             });
           });
-          domains[1][host] = cookies.cast<String, Map<String, SerializableCookie>>();
+          domains[1][host] =
+              cookies.cast<String, Map<String, SerializableCookie>>();
         } catch (e) {
-          //file.delete();
-          rethrow;
+          file.delete();
+          //rethrow;
         }
       }
     }
