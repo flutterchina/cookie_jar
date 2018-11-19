@@ -37,7 +37,7 @@ class DefaultCookieJar implements CookieJar {
         Map<String, Map<String, SerializableCookie>> cookies) {
       if (uri.host.contains(domain)) {
         cookies.forEach((String path, Map<String, SerializableCookie> values) {
-          if (urlPath.contains(path)) {
+          if (urlPath.toLowerCase().contains(path)) {
             values.forEach((String key, SerializableCookie v) {
               if (_check(uri.scheme, v)) {
                 list.add(v.cookie);
@@ -56,7 +56,7 @@ class DefaultCookieJar implements CookieJar {
             .cast<String, Map<String, dynamic>>();
 
         for (String path in cookies.keys) {
-          if (urlPath.contains(path)) {
+          if (urlPath.toLowerCase().contains(path)) {
             final Map<String, dynamic> values = cookies[path];
             for (String key in values.keys) {
               final SerializableCookie cookie = values[key];
