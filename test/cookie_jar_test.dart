@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
-import 'package:cookie_jar/src/persist_cookie_jar.dart';
 import 'package:test/test.dart';
 
 void main() async {
@@ -23,7 +22,8 @@ void main() async {
     test('DefaultCookieJar', () async {
       final CookieJar cj = new CookieJar();
       cj.saveFromResponse(Uri.parse('https://www.baidu.com/xx'), cookies);
-      List<Cookie> results = cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
+      List<Cookie> results =
+          cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
       expect(results.length, 2);
       results = cj.loadForRequest(Uri.parse('https://www.baidu.com/xx/dd'));
       expect(results.length, 2);
@@ -45,18 +45,20 @@ void main() async {
         new Cookie('location', 'china')..domain = 'qq.com',
       ];
       cj.saveFromResponse(Uri.parse('https://www.facebook.com/tt'), cookies);
-      final List<Cookie> results = cj.loadForRequest(Uri.parse('https://tt.facebook.com/xxx'));
+      final List<Cookie> results =
+          cj.loadForRequest(Uri.parse('https://tt.facebook.com/xxx'));
       expect(results.length, 1);
     });
 
     test('SharedCookiePersist', () async {
-      final PersistCookieJar cj = new PersistCookieJar('./cookies');
+      final PersistCookieJar cj = new PersistCookieJar(dir: './cookies');
       final List<Cookie> cookies = <Cookie>[
         new Cookie('name', 'wendux')..domain = '.facebook.com',
         new Cookie('location', 'china')..domain = 'qq.com',
       ];
       cj.saveFromResponse(Uri.parse('https://www.facebook.com/tt'), cookies);
-      List<Cookie> results = cj.loadForRequest(Uri.parse('https://tt.facebook.com/xxx'));
+      List<Cookie> results =
+          cj.loadForRequest(Uri.parse('https://tt.facebook.com/xxx'));
       expect(results.length, 1);
       cj.delete(Uri.parse('https://www.facebook.com/'));
       results = cj.loadForRequest(Uri.parse('https://tt.facebook.com/xxx'));
@@ -67,9 +69,10 @@ void main() async {
     });
 
     test('PersistCookieJar', () async {
-      final PersistCookieJar cj = new PersistCookieJar('./cookies');
+      final PersistCookieJar cj = new PersistCookieJar(dir: './cookies');
       cj.saveFromResponse(Uri.parse('https://www.baidu.com/xx'), cookies);
-      List<Cookie> results = cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
+      List<Cookie> results =
+          cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
       expect(results.length, 2);
       results = cj.loadForRequest(Uri.parse('https://www.baidu.com/xx/dd'));
       expect(results.length, 2);
@@ -89,14 +92,35 @@ void main() async {
     });
 
     test('PersistCookieJarLoad', () async {
-      final PersistCookieJar cj = new PersistCookieJar('./test/cookies');
-      List<Cookie> results = cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
+      final PersistCookieJar cj = new PersistCookieJar(dir: './test/cookies');
+      List<Cookie> results =
+          cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
       expect(results.length, 2);
       results = cj.loadForRequest(Uri.parse('https://www.baidu.com/xx/dd'));
       expect(results.length, 2);
       results = cj.loadForRequest(Uri.parse('https://www.baidu.com/'));
       expect(results.length, 0);
       results = cj.loadForRequest(Uri.parse('https://google.com'));
+    });
+
+    test('PersistCookieIgnoreExpires', () async {
+      final PersistCookieJar cj = new PersistCookieJar(
+          dir: './test/cookies',
+          ignoreExpires: true,
+      );
+      final Uri uri=Uri.parse('https://xxx.xxx.com/');
+      cj.delete(uri);
+      List<Cookie> results;
+      final Cookie cookie=Cookie('test', 'hh')
+        ..expires = DateTime.parse('1970-02-27 13:27:00');
+      cj.saveFromResponse(uri, <Cookie>[
+       cookie,
+      ]);
+      results = cj.loadForRequest(uri);
+      expect(results.length, 1);
+      cj.ignoreExpires = false;
+      results = cj.loadForRequest(uri);
+      expect(results.length, 0);
     });
   });
 }

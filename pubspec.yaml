@@ -1,18 +1,18 @@
 name: cookie_jar
 description: A cookie manager for http requests in Dart, by which you can deal with the complex cookie policy and persist cookies easily.
-version: 0.0.6
+version: 0.0.8
 homepage: https://github.com/flutterchina/cookie_jar
 author: wendux <824783146@qq.com>, long1eu<home@long1.eu>
 
 environment:
-  sdk: '>=1.20.1 <4.0.0'
+  sdk: '>=1.20.1 <3.0.0'
 
 #dependencies:
 #  path: ^1.4.1
 
 dev_dependencies:
-  test: ^0.12.0
-  coverage: "^0.9.3"
-  dart_codecov_generator:
-    git:
-      url: "https://github.com/wendux/dart-codecov.git"
+  test: ^1.5.1
+#  coverage: "^0.9.3"
+#  dart_codecov_generator:
+#    git:
+#      url: "https://github.com/wendux/dart-codecov.git"
