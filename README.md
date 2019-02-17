@@ -61,7 +61,7 @@ var cj=new PersistCookieJar("./cookies");
 > // API `getTemporaryDirectory` is from "path_provider" package.
 > Directory tempDir = await getTemporaryDirectory();
 > String tempPath = tempDir.path;
-> CookieJar cj=new PersistCookieJar(tempPath);
+> CookieJar cj=new PersistCookieJar(dir:tempPath);
 > ```
 
 
@@ -103,7 +103,7 @@ cj.saveFromResponse(uri, response.cookies);
 
 ```dart
 var dio = new Dio();
-dio.cookieJar=new PersistCookieJar("./cookies");
+dio.cookieJar=new PersistCookieJar(dir:"./cookies");
 Response<String>  response = await dio.get("https://www.baidu.com");
 ```
 
