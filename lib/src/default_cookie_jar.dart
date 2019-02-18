@@ -1,8 +1,6 @@
 import 'dart:io';
-
 import 'package:cookie_jar/src/cookie_jar.dart';
 import 'package:cookie_jar/src/serializable_cookie.dart';
-import 'package:meta/meta.dart';
 
 /// [DefaultCookieJar] is a default cookie manager which implements the standard
 /// cookie policy declared in RFC. [DefaultCookieJar] saves the cookies in RAM, so if the application
@@ -33,7 +31,6 @@ class DefaultCookieJar implements CookieJar {
     <String, Map<String, Map<String, SerializableCookie>>>{}
   ];
 
-  @protected
   List<Map<String, Map<String, Map<String, SerializableCookie>>>> get domains =>
       _domains;
 
