@@ -2,7 +2,6 @@
 
 [![build statud](https://img.shields.io/travis/flutterchina/cookie_jar/master.svg?style=flat-square)](https://travis-ci.org/flutterchina/cookie_jar)
 [![Pub](https://img.shields.io/pub/v/cookie_jar.svg?style=flat-square)](https://pub.dartlang.org/packages/cookie_jar)
-[![coverage](https://img.shields.io/codecov/c/github/flutterchina/cookie_jar/master.svg?style=flat-square)](https://codecov.io/github/flutterchina/cookie_jar?branch=master)
 [![support](https://img.shields.io/badge/platform-flutter%7Cdart%20vm-ff69b4.svg?style=flat-square)](https://github.com/flutterchina/cookie_jar)
 
 A cookie manager for http requests in Dart, by which you can deal with the complex cookie policy and persist cookies easily.
@@ -52,7 +51,10 @@ var cj= new CookieJar();
 
 ```dart
 // Cookie files will be saved in "./cookies"
-var cj=new PersistCookieJar("./cookies");
+var cj=new PersistCookieJar(
+    dir:"./cookies",
+    ignoreExpires:true, //save/load even cookies that have expired.
+);
 ```
 
 > **Note**: In Flutter, File system is different from PC,  you can use [path_provider](https://pub.dartlang.org/packages/path_provider) package to get the path :

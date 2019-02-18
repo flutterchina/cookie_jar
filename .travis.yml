@@ -5,7 +5,3 @@ dart:
 dart_task:
 - dartanalyzer: true
 - test: --platform vm
-
-script:
-- pub run test_coverage
-- bash <(curl -s https://codecov.io/bash)

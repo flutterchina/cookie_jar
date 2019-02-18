@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cookie_jar/src/cookie_jar.dart';
 import 'package:cookie_jar/src/serializable_cookie.dart';
+import 'package:meta/meta.dart';
 
 /// [DefaultCookieJar] is a default cookie manager which implements the standard
 /// cookie policy declared in RFC. [DefaultCookieJar] saves the cookies in RAM, so if the application
@@ -26,11 +27,15 @@ class DefaultCookieJar implements CookieJar {
                   Map<
                       String, //cookie name
                       SerializableCookie //cookie
-                      >>>> domains =
+                      >>>> _domains =
       <Map<String, Map<String, Map<String, SerializableCookie>>>>[
     <String, Map<String, Map<String, SerializableCookie>>>{},
     <String, Map<String, Map<String, SerializableCookie>>>{}
   ];
+
+  @protected
+  List<Map<String, Map<String, Map<String, SerializableCookie>>>> get domains =>
+      _domains;
 
   @override
   List<Cookie> loadForRequest(Uri uri) {
@@ -52,7 +57,7 @@ class DefaultCookieJar implements CookieJar {
       }
     });
     // Load cookies without "domain" attribute, include port.
-    final String hostname = '${uri.host}${uri.port}';
+    final String hostname = uri.host;
 
     for (String domain in domains[1].keys) {
       if (hostname == domain) {
@@ -79,41 +84,32 @@ class DefaultCookieJar implements CookieJar {
   void saveFromResponse(Uri uri, List<Cookie> cookies) {
     for (Cookie cookie in cookies) {
       String domain = cookie.domain;
-      // Save cookies with "domain" attribute, Ignore port.
+      String path;
+      int index = 0;
+      // Save cookies with "domain" attribute
       if (domain != null) {
         if (domain.startsWith('.')) {
           domain = domain.substring(1);
         }
-        final String path = cookie.path ?? '/';
-
-        final Map<String, Map<String, SerializableCookie>> mapDomain =
-            domains[0][domain] ?? <String, Map<String, SerializableCookie>>{};
-        final Map<String, SerializableCookie> map =
-            mapDomain[path] ?? <String, SerializableCookie>{};
-        map[cookie.name] = new SerializableCookie(cookie);
-        if (_isExpired(map[cookie.name])) {
-          map.remove(cookie.name);
-        }
-        mapDomain[path] = map;
-        domains[0][domain] = mapDomain;
+        path = cookie.path ?? '/';
       } else {
-        // Save cookies without "domain" attribute, include port.
-        final String path = cookie.path ?? (uri.path.isEmpty ? '/' : uri.path);
-        final String domain = '${uri.host}${uri.port}';
-
-        Map<String, Map<String, dynamic>> mapDomain =
-            domains[1][domain] ?? <String, Map<String, dynamic>>{};
-        mapDomain = mapDomain.cast<String, Map<String, dynamic>>();
-
-        final Map<String, dynamic> map = mapDomain[path] ?? <String, dynamic>{};
-        map[cookie.name] = new SerializableCookie(cookie);
-        if (_isExpired(map[cookie.name])) {
-          map.remove(cookie.name);
-        }
-        mapDomain[path] = map.cast<String, SerializableCookie>();
-        domains[1][domain] =
-            mapDomain.cast<String, Map<String, SerializableCookie>>();
+        index = 1;
+        // Save cookies without "domain" attribute
+        path = cookie.path ?? (uri.path.isEmpty ? '/' : uri.path);
+        domain = uri.host;
       }
+      Map<String, Map<String, dynamic>> mapDomain =
+          domains[index][domain] ?? <String, Map<String, dynamic>>{};
+      mapDomain = mapDomain.cast<String, Map<String, dynamic>>();
+
+      final Map<String, dynamic> map = mapDomain[path] ?? <String, dynamic>{};
+      map[cookie.name] = new SerializableCookie(cookie);
+      if (_isExpired(map[cookie.name])) {
+        map.remove(cookie.name);
+      }
+      mapDomain[path] = map.cast<String, SerializableCookie>();
+      domains[index][domain] =
+          mapDomain.cast<String, Map<String, SerializableCookie>>();
     }
   }
 
@@ -122,7 +118,7 @@ class DefaultCookieJar implements CookieJar {
   ///
   /// [withDomainSharedCookie] `true` will delete the domain-shared cookies.
   void delete(Uri uri, [bool withDomainSharedCookie = false]) {
-    final String host = '${uri.host}${uri.port}';
+    final String host = uri.host;
     domains[1].remove(host);
     if (withDomainSharedCookie) {
       domains[0].removeWhere(
@@ -131,52 +127,10 @@ class DefaultCookieJar implements CookieJar {
     }
   }
 
-//  /// delete cookies for specified domain+port, path will be ignored!
-//  void deleteKeys(Uri uri, String key, [bool withDomainSharedCookie = false]) {
-//    final String host = '${uri.host}${uri.port}';
-//    final String urlPath = uri.path.isEmpty ? '/' : uri.path;
-//    var cookies = domains[1][host];
-//    cookies?.forEach((path, _cookies) {
-//      _cookies?.removeWhere((name, v) {
-//        return name == key;
-//      });
-//    });
-//    if (withDomainSharedCookie) {
-//      domains[0].forEach((String domain, v){
-//        if(uri.host.contains(domain)){
-//          v[urlPath]?.removeWhere((name, v) {
-//            return name == key;
-//          });
-//        }
-//      });
-//    }
-//  }
-//
-//  void deleteKey(Uri uri, String key, [bool withDomainSharedCookie = false]) {
-//    final String host = '${uri.host}${uri.port}';
-//    var cookies = domains[1][host];
-//    if(cookies!=null) {
-//      final String urlPath = uri.path.isEmpty ? '/' : uri.path;
-//      cookies[urlPath]?.removeWhere((name, v) {
-//        return name == key;
-//      });
-//    }
-//    if (withDomainSharedCookie) {
-//      final String urlPath = uri.path.isEmpty ? '/' : uri.path;
-//      domains[0].forEach((String domain, v){
-//          if(uri.host.contains(domain)){
-//            v[urlPath]?.removeWhere((name, v) {
-//              return name == key;
-//            });
-//          }
-//      });
-//    }
-//  }
-//}
-
   /// Delete all cookies in RAM
   void deleteAll() {
-    domains.clear();
+    domains[0].clear();
+    domains[1].clear();
   }
 
   bool _isExpired(SerializableCookie cookie) {
@@ -188,5 +142,5 @@ class DefaultCookieJar implements CookieJar {
   }
 
   @override
-  bool ignoreExpires;
+  final bool ignoreExpires;
 }

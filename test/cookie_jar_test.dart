@@ -69,7 +69,7 @@ void main() async {
     });
 
     test('PersistCookieJar', () async {
-      final PersistCookieJar cj = new PersistCookieJar(dir: './cookies');
+      final PersistCookieJar cj = new PersistCookieJar(dir: './test/cookies');
       cj.saveFromResponse(Uri.parse('https://www.baidu.com/xx'), cookies);
       List<Cookie> results =
           cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
@@ -104,21 +104,24 @@ void main() async {
     });
 
     test('PersistCookieIgnoreExpires', () async {
-      final PersistCookieJar cj = new PersistCookieJar(
-          dir: './test/cookies',
-          ignoreExpires: true,
+      PersistCookieJar cj = new PersistCookieJar(
+        dir: './test/cookies',
+        ignoreExpires: true,
       );
-      final Uri uri=Uri.parse('https://xxx.xxx.com/');
+      final Uri uri = Uri.parse('https://xxx.xxx.com/');
       cj.delete(uri);
       List<Cookie> results;
-      final Cookie cookie=Cookie('test', 'hh')
+      final Cookie cookie = Cookie('test', 'hh')
         ..expires = DateTime.parse('1970-02-27 13:27:00');
       cj.saveFromResponse(uri, <Cookie>[
-       cookie,
+        cookie,
       ]);
       results = cj.loadForRequest(uri);
       expect(results.length, 1);
-      cj.ignoreExpires = false;
+      cj = new PersistCookieJar(
+        dir: './test/cookies',
+        ignoreExpires: false,
+      );
       results = cj.loadForRequest(uri);
       expect(results.length, 0);
     });
