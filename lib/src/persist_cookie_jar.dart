@@ -45,6 +45,11 @@ class PersistCookieJar extends DefaultCookieJar {
   List<Map<String, Map<String, Map<String, SerializableCookie>>>> get domains =>
       _dirInit[_dir];
 
+  void forceInit() {
+    _dirInit[_dir] = null;
+    _checkInited();
+  }
+
   void _checkInited(){
     if (_dirInit[_dir] == null) {
       _dirInit[_dir] = [
