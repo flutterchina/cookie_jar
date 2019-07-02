@@ -38,6 +38,29 @@ class DefaultCookieJar implements CookieJar {
   List<Cookie> loadForRequest(Uri uri) {
     final List<Cookie> list = <Cookie>[];
     final String urlPath = uri.path.isEmpty ? '/' : uri.path;
+    // Load cookies without "domain" attribute, include port.
+    final String hostname = uri.host;
+    for (String domain in domains[1].keys) {
+      if (hostname == domain) {
+        final Map<String, Map<String, dynamic>> cookies =
+            domains[1][domain].cast<String, Map<String, dynamic>>();
+        var keys = cookies.keys.toList()
+          ..sort((a, b) => b.length.compareTo(a.length));
+        for (String path in keys) {
+          if (urlPath.toLowerCase().contains(path)) {
+            final Map<String, dynamic> values = cookies[path];
+            for (String key in values.keys) {
+              final SerializableCookie cookie = values[key];
+              if (_check(uri.scheme, cookie)) {
+                if (list.indexWhere((e) => e.name == cookie.cookie.name) == -1) {
+                  list.add(cookie.cookie);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
     // Load cookies with "domain" attribute, Ignore port.
     domains[0].forEach(
         (String domain, Map<String, Map<String, SerializableCookie>> cookies) {
@@ -53,27 +76,6 @@ class DefaultCookieJar implements CookieJar {
         });
       }
     });
-    // Load cookies without "domain" attribute, include port.
-    final String hostname = uri.host;
-
-    for (String domain in domains[1].keys) {
-      if (hostname == domain) {
-        final Map<String, Map<String, dynamic>> cookies =
-            domains[1][domain].cast<String, Map<String, dynamic>>();
-
-        for (String path in cookies.keys) {
-          if (urlPath.toLowerCase().contains(path)) {
-            final Map<String, dynamic> values = cookies[path];
-            for (String key in values.keys) {
-              final SerializableCookie cookie = values[key];
-              if (_check(uri.scheme, cookie)) {
-                list.add(cookie.cookie);
-              }
-            }
-          }
-        }
-      }
-    }
     return list;
   }
 
