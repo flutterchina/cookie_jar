@@ -104,9 +104,20 @@ cj.saveFromResponse(uri, response.cookies);
 [dio](https://github.com/flutterchina/dio) is a powerful Http client for Dart, which supports Interceptors, Global configuration, FormData, File downloading, Timeout etc.  And [dio](https://github.com/flutterchina/dio) supports to manage cookies with cookie_jar, the simple example is:
 
 ```dart
-var dio = new Dio();
-dio.cookieJar=new PersistCookieJar(dir:"./cookies");
-Response<String>  response = await dio.get("https://www.baidu.com");
+import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:cookie_jar/cookie_jar.dart';
+
+main() async {
+  var dio =  Dio();
+  var cookieJar=CookieJar();
+  dio.interceptors.add(CookieManager(cookieJar));
+  await dio.get("https://baidu.com/");
+  // Print cookies
+  print(cookieJar.loadForRequest(Uri.parse("https://baidu.com/")));
+  // second request with the cookie
+  await dio.get("https://baidu.com/");
+}
 ```
 
 More details about [dio](https://github.com/flutterchina/dio)  see : https://github.com/flutterchina/dio .
