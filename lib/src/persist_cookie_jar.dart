@@ -172,6 +172,37 @@ class PersistCookieJar extends DefaultCookieJar {
     }
   }
 
+  /// Delete all cookies stored by [PersistCookieJar] instance that match specified [uri].
+  /// This API will delete all cookies for the `uri.host`, it will ignored the `uri.path`.
+  ///
+  /// [withDomainSharedCookie] `true` will delete the domain-shared cookies.
+  static void deleteCookies(Uri uri, [bool withDomainSharedCookie = false]) {
+    final String host = uri.host;
+    _dirInit.forEach((dir,domains){
+      domains[1].remove(host);
+      if (withDomainSharedCookie) {
+        domains[0].removeWhere(
+          (String domain, Map<String, Map<String, SerializableCookie>> v) =>
+              uri.host.contains(domain));
+      }
+    });
+    File file;
+    _dirCookieDomains.forEach((path,domains){
+      if (domains.remove(host)) {
+        file = new File('$path.index');
+        file.writeAsStringSync(json.encode(domains));
+      }
+      file = new File('$path$host');
+      if (file.existsSync()) {
+        file.delete();
+      }
+      if (withDomainSharedCookie) {
+        file = new File('$path.domains');
+        file.writeAsStringSync(json.encode(domains[0]));
+      }
+    });
+  }
+
   /// Delete all cookies files under [dir] directory and clear them out from RAM
   @override
   void deleteAll() {
@@ -181,6 +212,21 @@ class PersistCookieJar extends DefaultCookieJar {
     if (directory.existsSync()) {
       directory.deleteSync(recursive: true);
     }
+  }
+
+  /// Delete all cookies files that stored by [PersistCookieJar] instance and clear them out from RAM
+  static void deleteAllCookies(){
+    _dirInit.forEach((dir,domains){
+      domains[0].clear();
+      domains[1].clear();
+    });
+    _dirCookieDomains.forEach((path,domains){
+      final Directory directory = Directory(path);
+      if (directory.existsSync()) {
+        directory.deleteSync(recursive: true);
+      }
+      domains.clear();
+    });
   }
 
   void _save(Uri uri, [bool withDomainSharedCookie = false]) {

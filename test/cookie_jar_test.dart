@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:cookie_jar/src/persist_cookie_jar.dart';
 import 'package:test/test.dart';
 
 void main() async {
@@ -126,4 +127,39 @@ void main() async {
       expect(results.length, 0);
     });
   });
+  test("deleteAllCookies", () async {
+    final uri = Uri.parse("https://www.baidu.com/aa");
+    final ignoredUri = Uri.parse("https://www.google.com/aa");
+    final cookies = <Cookie>[
+      Cookie("ignore","false")
+    ];
+    final ignoredCookies = <Cookie>[
+      Cookie("ignore","true")
+    ];
+    final PersistCookieJar cj = PersistCookieJar(
+      dir: "./test/cookies"
+    );
+    final PersistCookieJar ignoredCj = PersistCookieJar(
+      dir: "./test/cookies",
+      ignoreExpires: true
+    );
+    cj.saveFromResponse(uri, cookies);
+    ignoredCj.saveFromResponse(ignoredUri, ignoredCookies);
+    var result = cj.loadForRequest(uri);
+    var ignoredResult = ignoredCj.loadForRequest(ignoredUri);
+    expect(result.length, 1);
+    expect(ignoredResult.length,1);
+    PersistCookieJar.deleteCookies(uri);
+    result = cj.loadForRequest(uri);
+    ignoredResult = ignoredCj.loadForRequest(ignoredUri);
+    expect(result.length, 0);
+    expect(ignoredResult.length,1);
+    PersistCookieJar.deleteAllCookies();
+    result = cj.loadForRequest(uri);
+    ignoredResult = ignoredCj.loadForRequest(ignoredUri);
+    expect(result.length, 0);
+    expect(ignoredResult.length,0);
+
+  });
+
 }

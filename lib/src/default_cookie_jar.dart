@@ -125,11 +125,30 @@ class DefaultCookieJar implements CookieJar {
               uri.host.contains(domain));
     }
   }
+  /// Delete cookies for specified [uri].
+  /// This API will delete all cookies for the `uri.host`, it will ignored the `uri.path`.
+  ///
+  /// [withDomainSharedCookie] `true` will delete the domain-shared cookies.
+  static void deleteCookies(Uri uri, [bool withDomainSharedCookie = false]) {
+    final String host = uri.host;
+    _domains[1].remove(host);
+    if (withDomainSharedCookie) {
+      _domains[0].removeWhere(
+          (String domain, Map<String, Map<String, SerializableCookie>> v) =>
+              uri.host.contains(domain));
+    }
+  }
 
   /// Delete all cookies in RAM
   void deleteAll() {
     domains[0].clear();
     domains[1].clear();
+  }
+
+  /// Delete all cookies in RAM
+  static void deleteAllCookies() {
+    _domains[0].clear();
+    _domains[1].clear();
   }
 
   bool _isExpired(SerializableCookie cookie) {
