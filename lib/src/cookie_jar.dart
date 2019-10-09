@@ -13,6 +13,9 @@ abstract class CookieJar {
 
   /// Load the cookies for specified uri.
   List<Cookie> loadForRequest(Uri uri);
+  
+  //Delete all stored cookies for CookieJar
+  void deleteAll() {}
 
   final bool ignoreExpires;
 }
