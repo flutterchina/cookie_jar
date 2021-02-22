@@ -17,7 +17,7 @@ class DefaultCookieJar implements CookieJar {
   /// [domains[1]] save the cookies without "domain" attribute.
   /// These cookies are private for each host name.
   ///
-  static List<
+  static final List<
           Map<
               String, //domain
               Map<
@@ -36,23 +36,24 @@ class DefaultCookieJar implements CookieJar {
 
   @override
   List<Cookie> loadForRequest(Uri uri) {
-    final List<Cookie> list = <Cookie>[];
-    final String urlPath = uri.path.isEmpty ? '/' : uri.path;
+    final list = <Cookie>[];
+    final urlPath = uri.path.isEmpty ? '/' : uri.path;
     // Load cookies without "domain" attribute, include port.
-    final String hostname = uri.host;
-    for (String domain in domains[1].keys) {
+    final hostname = uri.host;
+    for (final domain in domains[1].keys) {
       if (hostname == domain) {
-        final Map<String, Map<String, dynamic>> cookies =
-            domains[1][domain].cast<String, Map<String, dynamic>>();
+        final cookies =
+            domains[1][domain]!.cast<String, Map<String, dynamic>>();
         var keys = cookies.keys.toList()
           ..sort((a, b) => b.length.compareTo(a.length));
-        for (String path in keys) {
+        for (final path in keys) {
           if (urlPath.toLowerCase().contains(path)) {
-            final Map<String, dynamic> values = cookies[path];
-            for (String key in values.keys) {
+            final values = cookies[path]!;
+            for (final key in values.keys) {
               final SerializableCookie cookie = values[key];
               if (_check(uri.scheme, cookie)) {
-                if (list.indexWhere((e) => e.name == cookie.cookie.name) == -1) {
+                if (list.indexWhere((e) => e.name == cookie.cookie.name) ==
+                    -1) {
                   list.add(cookie.cookie);
                 }
               }
@@ -81,10 +82,10 @@ class DefaultCookieJar implements CookieJar {
 
   @override
   void saveFromResponse(Uri uri, List<Cookie> cookies) {
-    for (Cookie cookie in cookies) {
-      String domain = cookie.domain;
+    for (final cookie in cookies) {
+      var domain = cookie.domain;
       String path;
-      int index = 0;
+      var index = 0;
       // Save cookies with "domain" attribute
       if (domain != null) {
         if (domain.startsWith('.')) {
@@ -97,12 +98,12 @@ class DefaultCookieJar implements CookieJar {
         path = cookie.path ?? (uri.path.isEmpty ? '/' : uri.path);
         domain = uri.host;
       }
-      Map<String, Map<String, dynamic>> mapDomain =
+      var mapDomain =
           domains[index][domain] ?? <String, Map<String, dynamic>>{};
       mapDomain = mapDomain.cast<String, Map<String, dynamic>>();
 
-      final Map<String, dynamic> map = mapDomain[path] ?? <String, dynamic>{};
-      map[cookie.name] = new SerializableCookie(cookie);
+      final map = mapDomain[path] ?? <String, dynamic>{};
+      map[cookie.name] = SerializableCookie(cookie);
       if (_isExpired(map[cookie.name])) {
         map.remove(cookie.name);
       }
@@ -117,7 +118,7 @@ class DefaultCookieJar implements CookieJar {
   ///
   /// [withDomainSharedCookie] `true` will delete the domain-shared cookies.
   void delete(Uri uri, [bool withDomainSharedCookie = false]) {
-    final String host = uri.host;
+    final host = uri.host;
     domains[1].remove(host);
     if (withDomainSharedCookie) {
       domains[0].removeWhere(
@@ -132,8 +133,8 @@ class DefaultCookieJar implements CookieJar {
     domains[1].clear();
   }
 
-  bool _isExpired(SerializableCookie cookie) {
-    return ignoreExpires ? false : cookie.isExpired();
+  bool _isExpired(SerializableCookie? cookie) {
+    return ignoreExpires ? false : cookie!.isExpired();
   }
 
   bool _check(String scheme, SerializableCookie cookie) {

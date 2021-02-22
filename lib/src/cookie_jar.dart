@@ -14,5 +14,5 @@ abstract class CookieJar {
   /// Load the cookies for specified uri.
   List<Cookie> loadForRequest(Uri uri);
 
-  final bool ignoreExpires;
+  final bool ignoreExpires = false;
 }
