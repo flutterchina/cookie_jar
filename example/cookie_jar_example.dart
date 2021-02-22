@@ -15,7 +15,7 @@ void main() async {
   final dir = Directory('./example/.cookies');
   await dir.create(recursive: true);
   final cj = CookieJar();
-  //var cj=new PersistCookieJar('./example/.cookies');
+  //var cj=PersistCookieJar('./example/.cookies');
   cj.saveFromResponse(Uri.parse('https://www.baidu.com/xx'), cookies);
   var results = cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
   assert(results.length == 2);

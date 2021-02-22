@@ -20,8 +20,8 @@ A simple usage example:
 ```dart
 import 'package:cookie_jar/cookie_jar.dart';
 void main() async {
-  List<Cookie> cookies = [new Cookie("name", "wendux"),new Cookie("location", "china")];
-  var cj = new CookieJar();
+  List<Cookie> cookies = [Cookie("name", "wendux"),Cookie("location", "china")];
+  var cj = CookieJar();
   //Save cookies   
   cj.saveFromResponse(Uri.parse("https://www.baidu.com/"), cookies);
   //Get cookies  
@@ -42,7 +42,7 @@ This class is a wrapper for `Cookie` class. Because the `Cookie` class doesn't  
 `CookieJar` is a default cookie manager which implements the standard cookie policy declared in RFC. CookieJar saves the cookies in **RAM**, so if the application exit, all cookies will be cleared. A example as follow:
 
 ```dart
-var cj= new CookieJar();
+var cj= CookieJar();
 ```
 
 ### `PersistCookieJar`
@@ -51,7 +51,7 @@ var cj= new CookieJar();
 
 ```dart
 // Cookie files will be saved in "./cookies"
-var cj=new PersistCookieJar(
+var cj = PersistCookieJar(
     dir:"./cookies",
     ignoreExpires:true, //save/load even cookies that have expired.
 );
@@ -63,7 +63,7 @@ var cj=new PersistCookieJar(
 > // API `getTemporaryDirectory` is from "path_provider" package.
 > Directory tempDir = await getTemporaryDirectory();
 > String tempPath = tempDir.path;
-> CookieJar cj=new PersistCookieJar(dir:tempPath);
+> CookieJar cj=PersistCookieJar(dir:tempPath);
 > ```
 
 
@@ -91,11 +91,11 @@ If `withDomainSharedCookie` is `true `  ,  will delete the domain-shared cookies
 Using  `CookieJar` or `PersistCookieJar` manages  `HttpClient ` 's  request/response cookies is very easy:
 
 ```dart
-var cj=new CookieJar();
+var cj=CookieJar();
 ...
-request= await httpClient.openUrl(options.method, uri);
+request = await httpClient.openUrl(options.method, uri);
 request.cookies.addAll(cj.loadForRequest(uri));
-response= await request.close();
+response = await request.close();
 cj.saveFromResponse(uri, response.cookies);
 ```
 
@@ -109,7 +109,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 
 main() async {
-  var dio =  Dio();
+  var dio = Dio();
   var cookieJar=CookieJar();
   dio.interceptors.add(CookieManager(cookieJar));
   await dio.get("https://baidu.com/");

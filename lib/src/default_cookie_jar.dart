@@ -25,8 +25,11 @@ class DefaultCookieJar implements CookieJar {
                   Map<
                       String, //cookie name
                       SerializableCookie //cookie
-                      >>>> _domains =
-      <Map<String, Map<String, Map<String, SerializableCookie>>>>[
+                      >
+              >
+          >
+  > _domains =
+    <Map<String, Map<String, Map<String, SerializableCookie>>>>[
     <String, Map<String, Map<String, SerializableCookie>>>{},
     <String, Map<String, Map<String, SerializableCookie>>>{}
   ];
@@ -133,8 +136,8 @@ class DefaultCookieJar implements CookieJar {
     domains[1].clear();
   }
 
-  bool _isExpired(SerializableCookie? cookie) {
-    return ignoreExpires ? false : cookie!.isExpired();
+  bool _isExpired(SerializableCookie cookie) {
+    return ignoreExpires ? false : cookie.isExpired();
   }
 
   bool _check(String scheme, SerializableCookie cookie) {

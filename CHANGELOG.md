@@ -1,3 +1,8 @@
+
+## 2.0.0-nullsafety
+
+- support nullsafety
+
 ## 1.0.1
 
 - add `forceInit` method for PersistCookieJar
