@@ -1,5 +1,5 @@
 
-## 2.0.0-nullsafety
+## 2.0.1
 
 - support nullsafety
 
