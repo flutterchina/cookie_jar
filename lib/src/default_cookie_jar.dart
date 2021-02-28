@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:cookie_jar/src/cookie_jar.dart';
-import 'package:cookie_jar/src/serializable_cookie.dart';
+import 'cookie_jar.dart';
+import 'serializable_cookie.dart';
 
 /// [DefaultCookieJar] is a default cookie manager which implements the standard
 /// cookie policy declared in RFC. [DefaultCookieJar] saves the cookies in RAM, so if the application
@@ -17,9 +17,9 @@ class DefaultCookieJar implements CookieJar {
   /// [domains[1]] save the cookies without "domain" attribute.
   /// These cookies are private for each host name.
   ///
-  static final List<
+  final List<
           Map<
-              String, //domain
+              String, //domain or host
               Map<
                   String, //path
                   Map<
@@ -28,25 +28,26 @@ class DefaultCookieJar implements CookieJar {
                       >
               >
           >
-  > _domains =
+  > _cookies =
     <Map<String, Map<String, Map<String, SerializableCookie>>>>[
     <String, Map<String, Map<String, SerializableCookie>>>{},
     <String, Map<String, Map<String, SerializableCookie>>>{}
   ];
 
-  List<Map<String, Map<String, Map<String, SerializableCookie>>>> get domains =>
-      _domains;
+  Map<String, Map<String, Map<String, SerializableCookie>>> get domainCookies => _cookies[0];
+  Map<String, Map<String, Map<String, SerializableCookie>>> get hostCookies => _cookies[1];
+
 
   @override
-  List<Cookie> loadForRequest(Uri uri) {
+  Future<List<Cookie>> loadForRequest(Uri uri) async {
     final list = <Cookie>[];
     final urlPath = uri.path.isEmpty ? '/' : uri.path;
     // Load cookies without "domain" attribute, include port.
     final hostname = uri.host;
-    for (final domain in domains[1].keys) {
+    for (final domain in hostCookies.keys) {
       if (hostname == domain) {
         final cookies =
-            domains[1][domain]!.cast<String, Map<String, dynamic>>();
+        hostCookies[domain]!.cast<String, Map<String, dynamic>>();
         var keys = cookies.keys.toList()
           ..sort((a, b) => b.length.compareTo(a.length));
         for (final path in keys) {
@@ -66,7 +67,7 @@ class DefaultCookieJar implements CookieJar {
       }
     }
     // Load cookies with "domain" attribute, Ignore port.
-    domains[0].forEach(
+    domainCookies.forEach(
         (String domain, Map<String, Map<String, SerializableCookie>> cookies) {
       if (uri.host.contains(domain)) {
         cookies.forEach((String path, Map<String, SerializableCookie> values) {
@@ -84,7 +85,7 @@ class DefaultCookieJar implements CookieJar {
   }
 
   @override
-  void saveFromResponse(Uri uri, List<Cookie> cookies) {
+  Future<void> saveFromResponse(Uri uri, List<Cookie> cookies) async {
     for (final cookie in cookies) {
       var domain = cookie.domain;
       String path;
@@ -102,7 +103,7 @@ class DefaultCookieJar implements CookieJar {
         domain = uri.host;
       }
       var mapDomain =
-          domains[index][domain] ?? <String, Map<String, dynamic>>{};
+          _cookies[index][domain] ?? <String, Map<String, dynamic>>{};
       mapDomain = mapDomain.cast<String, Map<String, dynamic>>();
 
       final map = mapDomain[path] ?? <String, dynamic>{};
@@ -111,7 +112,7 @@ class DefaultCookieJar implements CookieJar {
         map.remove(cookie.name);
       }
       mapDomain[path] = map.cast<String, SerializableCookie>();
-      domains[index][domain] =
+      _cookies[index][domain] =
           mapDomain.cast<String, Map<String, SerializableCookie>>();
     }
   }
@@ -120,20 +121,23 @@ class DefaultCookieJar implements CookieJar {
   /// This API will delete all cookies for the `uri.host`, it will ignored the `uri.path`.
   ///
   /// [withDomainSharedCookie] `true` will delete the domain-shared cookies.
-  void delete(Uri uri, [bool withDomainSharedCookie = false]) {
+  @override
+  Future<void> delete(Uri uri, [bool withDomainSharedCookie = false]) async {
     final host = uri.host;
-    domains[1].remove(host);
+    hostCookies.remove(host);
     if (withDomainSharedCookie) {
-      domains[0].removeWhere(
+      domainCookies.removeWhere(
           (String domain, Map<String, Map<String, SerializableCookie>> v) =>
-              uri.host.contains(domain));
+              uri.host.contains(domain)
+      );
     }
   }
 
   /// Delete all cookies in RAM
-  void deleteAll() {
-    domains[0].clear();
-    domains[1].clear();
+  @override
+  Future<void> deleteAll() async {
+    domainCookies.clear();
+    hostCookies.clear();
   }
 
   bool _isExpired(SerializableCookie cookie) {

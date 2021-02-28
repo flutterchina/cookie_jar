@@ -12,22 +12,23 @@ void main() async {
     Cookie('location', 'china')
       ..expires = DateTime.now().add(const Duration(hours: 1)),
   ];
-  final dir = Directory('./example/.cookies');
-  await dir.create(recursive: true);
-  final cj = CookieJar();
-  //var cj=PersistCookieJar('./example/.cookies');
-  cj.saveFromResponse(Uri.parse('https://www.baidu.com/xx'), cookies);
-  var results = cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
+
+  //final cj = CookieJar();
+  //final cj = PersistCookieJar();
+  final cj = PersistCookieJar(storage: FileStorage('./example/.cookies'));
+
+  await cj.saveFromResponse(Uri.parse('https://www.baidu.com/xx'), cookies);
+  var results = await cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
   assert(results.length == 2);
-  results = cj.loadForRequest(Uri.parse('https://www.baidu.com/xx/dd'));
+  results = await cj.loadForRequest(Uri.parse('https://www.baidu.com/xx/dd'));
   assert(results.length == 2);
-  results = cj.loadForRequest(Uri.parse('https://www.baidu.com/'));
+  results = await cj.loadForRequest(Uri.parse('https://www.baidu.com/'));
   assert(results.isEmpty);
-  cj.saveFromResponse(Uri.parse('https://google.com'), cookiesExpired);
-  results = cj.loadForRequest(Uri.parse('https://google.com'));
+  await cj.saveFromResponse(Uri.parse('https://google.com'), cookiesExpired);
+  results = await cj.loadForRequest(Uri.parse('https://google.com'));
   assert(results.length == 2);
-  await Future<void>.delayed(const Duration(seconds: 2), () {
-    results = cj.loadForRequest(Uri.parse('https://google.com'));
+  await Future<void>.delayed(const Duration(seconds: 2), ()async {
+    results = await cj.loadForRequest(Uri.parse('https://google.com'));
     assert(results.length == 1);
   });
 }

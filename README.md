@@ -10,8 +10,7 @@ A cookie manager for http requests in Dart, by which you can deal with the compl
 
 ```yaml
 dependencies:
-  cookie_jar: ^1.0.1
-  # cookie_jar: ^2.0.0 # null-safety support
+  cookie_jar: ^3.0.0
 ```
 
 ## Usage
@@ -24,9 +23,9 @@ void main() async {
   List<Cookie> cookies = [Cookie("name", "wendux"),Cookie("location", "china")];
   var cj = CookieJar();
   //Save cookies   
-  cj.saveFromResponse(Uri.parse("https://www.baidu.com/"), cookies);
+  await cj.saveFromResponse(Uri.parse("https://www.baidu.com/"), cookies);
   //Get cookies  
-  List<Cookie> results = cj.loadForRequest(Uri.parse("https://www.baidu.com/xx"));
+  List<Cookie> results = await cj.loadForRequest(Uri.parse("https://www.baidu.com/xx"));
   print(results);  
 }    
        
@@ -51,9 +50,8 @@ var cj= CookieJar();
 `PersistCookieJar` is a cookie manager which implements the standard cookie policy declared in RFC. `PersistCookieJar`  persists the cookies in files, so if the application exit, the cookies always exist unless call `delete` explicitly. A example as follows:
 
 ```dart
-// Cookie files will be saved in "./cookies"
+// Cookie files will be saved in files in "./cookies"
 var cj = PersistCookieJar(
-    dir:"./cookies",
     ignoreExpires:true, //save/load even cookies that have expired.
 );
 ```
@@ -63,11 +61,18 @@ var cj = PersistCookieJar(
 > ```dart
 > // API `getTemporaryDirectory` is from "path_provider" package.
 > Directory tempDir = await getTemporaryDirectory();
-> String tempPath = tempDir.path;
-> CookieJar cj=PersistCookieJar(dir:tempPath);
+> var tempPath = tempDir.path;
+> var cj = PersistCookieJar(
+>           ignoreExpires: true,
+>           storage: FileStorage(tempPath)
+>         );
 > ```
 
 
+
+#### Storage
+
+Now, You can customize your own storage， refer to the implementation of `FileStorage` for details
 
 ## APIs
 
@@ -95,9 +100,9 @@ Using  `CookieJar` or `PersistCookieJar` manages  `HttpClient ` 's  request/resp
 var cj=CookieJar();
 ...
 request = await httpClient.openUrl(options.method, uri);
-request.cookies.addAll(cj.loadForRequest(uri));
+request.cookies.addAll(await cj.loadForRequest(uri));
 response = await request.close();
-cj.saveFromResponse(uri, response.cookies);
+await cj.saveFromResponse(uri, response.cookies);
 ```
 
 ## Working with dio
