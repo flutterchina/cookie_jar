@@ -6,13 +6,7 @@ homepage: https://github.com/flutterchina/cookie_jar
 environment:
   sdk: '>=2.12.0-29.10.beta <3.0.0'
 
-#dependencies:
-#  path: ^1.4.1
-
 dev_dependencies:
   test: ^1.16.3
   pedantic: ^1.10.0
-#  coverage: "^0.12.4"
-#  dart_codecov_generator:
-#    git:
-#      url: "https://github.com/wendux/dart-codecov.git"
+

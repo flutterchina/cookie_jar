@@ -10,7 +10,7 @@ A cookie manager for http requests in Dart, by which you can deal with the compl
 
 ```yaml
 dependencies:
-  cookie_jar: ^3.0.0
+  cookie_jar: 3.0.0-beta1
 ```
 
 ## Usage
@@ -68,23 +68,21 @@ var cj = PersistCookieJar(
 >         );
 > ```
 
-
-
 #### Storage
 
-Now, You can customize your own storage， refer to the implementation of `FileStorage` for details
+Now, You can customize your own storage，for more details refer to the implementation of `FileStorage` 
 
 ## APIs
 
-**void saveFromResponse(Uri uri, List<Cookie> cookies);**
+**Future<void> saveFromResponse(Uri uri, List<Cookie> cookies);**
 
 Save the cookies for specified uri.
 
-**List<Cookie> loadForRequest(Uri uri);**
+**Future<List<Cookie>> loadForRequest(Uri uri);**
 
 Load the cookies for specified uri.
 
-**delete(Uri uri,[bool withDomainSharedCookie = false] )**
+**Future<void> delete(Uri uri,[bool withDomainSharedCookie = false] )**
 
 Delete cookies for specified `uri`. This API will delete all cookies for the `uri.host`, it will ignored the `uri.path`.
 
@@ -125,6 +123,11 @@ main() async {
   await dio.get("https://baidu.com/");
 }
 ```
+
+> Note: cookieJar 3.0 need:
+>
+> - dio version >= 4.0
+> - dio_cookie_manager >= 3.0
 
 More details about [dio](https://github.com/flutterchina/dio)  see : https://github.com/flutterchina/dio .
 
