@@ -1,4 +1,11 @@
 
+## 3.0.0-beta2
+
+- Change all APIs to async
+- Add `delete` 、 `deleteAll` APIs in CookieJar class.
+- Support custom cookie persistent storage。
+
+
 ## 2.0.1
 
 - support nullsafety

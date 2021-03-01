@@ -74,7 +74,7 @@ Now, You can customize your own storage，for more details refer to the implemen
 
 ## APIs
 
-**Future<void> saveFromResponse(Uri uri, List<Cookie> cookies);**
+**Future<void>  saveFromResponse(Uri uri, List<Cookie> cookies);**
 
 Save the cookies for specified uri.
 
@@ -88,7 +88,9 @@ Delete cookies for specified `uri`. This API will delete all cookies for the `ur
 
 If `withDomainSharedCookie` is `true `  ,  will delete the domain-shared cookies.
 
-*Note: This API is only available in `PersistCookieJar` class.*
+**Future<void> deleteAll();**
+
+Delete all cookies 。
 
 ## Working with `HttpClient`
 
