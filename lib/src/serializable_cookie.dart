@@ -20,10 +20,11 @@ class SerializableCookie {
 
   bool isExpired() {
     final t = DateTime.now();
-    return (cookie.maxAge != null && cookie.maxAge! < 1)
-        || (cookie.maxAge != null
-            && (t.millisecondsSinceEpoch ~/ 1000).toInt() - createTimeStamp >= cookie.maxAge!)
-        || (cookie.expires != null && !cookie.expires!.isAfter(t));
+    return (cookie.maxAge != null && cookie.maxAge! < 1) ||
+        (cookie.maxAge != null &&
+            (t.millisecondsSinceEpoch ~/ 1000).toInt() - createTimeStamp >=
+                cookie.maxAge!) ||
+        (cookie.expires != null && !cookie.expires!.isAfter(t));
   }
 
   /// Serialize the Json string.

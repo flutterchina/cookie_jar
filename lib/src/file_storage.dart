@@ -6,7 +6,6 @@ import 'stroage.dart';
 ///Save cookies in  files
 
 class FileStorage implements Storage {
-
   FileStorage([this._dir]);
 
   /// [_dir]: where the cookie files saved in, it must be a directory path.

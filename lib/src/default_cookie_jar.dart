@@ -25,18 +25,16 @@ class DefaultCookieJar implements CookieJar {
                   Map<
                       String, //cookie name
                       SerializableCookie //cookie
-                      >
-              >
-          >
-  > _cookies =
-    <Map<String, Map<String, Map<String, SerializableCookie>>>>[
+                      >>>> _cookies =
+      <Map<String, Map<String, Map<String, SerializableCookie>>>>[
     <String, Map<String, Map<String, SerializableCookie>>>{},
     <String, Map<String, Map<String, SerializableCookie>>>{}
   ];
 
-  Map<String, Map<String, Map<String, SerializableCookie>>> get domainCookies => _cookies[0];
-  Map<String, Map<String, Map<String, SerializableCookie>>> get hostCookies => _cookies[1];
-
+  Map<String, Map<String, Map<String, SerializableCookie>>> get domainCookies =>
+      _cookies[0];
+  Map<String, Map<String, Map<String, SerializableCookie>>> get hostCookies =>
+      _cookies[1];
 
   @override
   Future<List<Cookie>> loadForRequest(Uri uri) async {
@@ -47,7 +45,7 @@ class DefaultCookieJar implements CookieJar {
     for (final domain in hostCookies.keys) {
       if (hostname == domain) {
         final cookies =
-        hostCookies[domain]!.cast<String, Map<String, dynamic>>();
+            hostCookies[domain]!.cast<String, Map<String, dynamic>>();
         var keys = cookies.keys.toList()
           ..sort((a, b) => b.length.compareTo(a.length));
         for (final path in keys) {
@@ -128,8 +126,7 @@ class DefaultCookieJar implements CookieJar {
     if (withDomainSharedCookie) {
       domainCookies.removeWhere(
           (String domain, Map<String, Map<String, SerializableCookie>> v) =>
-              uri.host.contains(domain)
-      );
+              uri.host.contains(domain));
     }
   }
 

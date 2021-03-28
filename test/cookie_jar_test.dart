@@ -144,8 +144,8 @@ void main() async {
         };
 
       var cj = PersistCookieJar(
-          ignoreExpires: true,
-          storage: storage,
+        ignoreExpires: true,
+        storage: storage,
       );
 
       final uri = Uri.parse('https://xxx.xxx.com/');
@@ -159,7 +159,7 @@ void main() async {
 
       results = await cj.loadForRequest(uri);
       expect(results.length, 1);
-      expect(results[0].value,'hh');
+      expect(results[0].value, 'hh');
 
       cj = PersistCookieJar(
         ignoreExpires: false,

@@ -27,7 +27,7 @@ void main() async {
   await cj.saveFromResponse(Uri.parse('https://google.com'), cookiesExpired);
   results = await cj.loadForRequest(Uri.parse('https://google.com'));
   assert(results.length == 2);
-  await Future<void>.delayed(const Duration(seconds: 2), ()async {
+  await Future<void>.delayed(const Duration(seconds: 2), () async {
     results = await cj.loadForRequest(Uri.parse('https://google.com'));
     assert(results.length == 1);
   });

@@ -9,4 +9,4 @@ export 'src/default_cookie_jar.dart';
 export 'src/persist_cookie_jar.dart';
 export 'src/serializable_cookie.dart';
 export 'src/stroage.dart';
-export 'src/file_stroage.dart';
+export 'src/file_storage.dart';

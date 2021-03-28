@@ -10,7 +10,7 @@ A cookie manager for http requests in Dart, by which you can deal with the compl
 
 ```yaml
 dependencies:
-  cookie_jar: 3.0.0-beta1
+  cookie_jar: 3.0.0
 ```
 
 ## Usage

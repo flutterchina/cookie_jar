@@ -1,5 +1,5 @@
 
-## 3.0.0-beta2
+## 3.0.0
 
 - Change all APIs to async
 - Add `delete` 、 `deleteAll` APIs in CookieJar class.

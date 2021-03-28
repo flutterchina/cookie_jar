@@ -1,11 +1,10 @@
-
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cookie_jar/cookie_jar.dart';
 
-void main() async{
+void main() async {
   var storage = FileStorage('./example/.cookies/encryption')
     ..readPreHandler = (Uint8List list) {
       // decrypt
@@ -31,7 +30,6 @@ void main() async{
   ]);
 
   results = await cj.loadForRequest(uri);
-  assert(results.length==1);
-  assert(results[0].value=='hh');
-
+  assert(results.length == 1);
+  assert(results[0].value == 'hh');
 }
