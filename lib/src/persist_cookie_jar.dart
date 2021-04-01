@@ -18,7 +18,6 @@ class PersistCookieJar extends DefaultCookieJar {
   /// [ignoreExpires]: save/load even cookies that have expired.
   ///
   /// [storage]: Defaults to FileStorage
-
   PersistCookieJar(
       {this.persistSession = true,
       bool ignoreExpires = false,
@@ -30,59 +29,66 @@ class PersistCookieJar extends DefaultCookieJar {
   /// Whether persisting the cookies that without "expires" or "max-age" attribute;
   final bool persistSession;
 
-  final IndexKey = '.index';
-  final DomainsKey = '.domains';
+  static const _indexKey = '.index';
+  static const _domainsKey = '.domains';
 
   late Storage storage;
 
   late Set<String> _hostSet;
+
   bool _initialized = false;
 
-  Future<void> forceInit() {
-    return _checkInitialized(force: true);
-  }
+  Future<void> forceInit() => _checkInitialized(force: true);
 
   Future<void> _checkInitialized({bool force = false}) async {
     if (force || !_initialized) {
       await storage.init(persistSession, ignoreExpires);
       // Load domain cookies
-      var str = await storage.read(DomainsKey);
+      var str = await storage.read(_domainsKey);
       if (str != null && str.isNotEmpty) {
         try {
           final Map<String, dynamic> jsonData = json.decode(str);
 
           final cookies = jsonData.map((String domain, dynamic _cookies) {
-            final Map<String, dynamic> cookies =
-                _cookies.cast<String, dynamic>();
-            final domainCookies = cookies.map((String path, dynamic map) {
-              final Map<String, String> cookieForPath =
-                  map.cast<String, String>();
-              final realCookies = cookieForPath.map(
-                  (String cookieName, String cookie) =>
-                      MapEntry<String, SerializableCookie>(
-                          cookieName, SerializableCookie.fromJson(cookie)));
-              return MapEntry<String, Map<String, SerializableCookie>>(
-                  path, realCookies);
+            final domainCookies = _cookies
+                .cast<String, dynamic>()
+                .map((String path, dynamic map) {
+              final cookieForPath = map.cast<String, String>();
+              final realCookies =
+                  cookieForPath.map<String, SerializableCookie>((
+                String cookieName,
+                String cookie,
+              ) {
+                return MapEntry(
+                  cookieName,
+                  SerializableCookie.fromJson(cookie),
+                );
+              });
+
+              return MapEntry(path, realCookies);
             });
+
             return MapEntry<String,
-                    Map<String, Map<String, SerializableCookie>>>(
-                domain, domainCookies);
+                Map<String, Map<String, SerializableCookie>>>(
+              domain,
+              domainCookies,
+            );
           });
           domainCookies
             ..clear()
             ..addAll(cookies);
         } catch (e) {
-          await storage.delete(DomainsKey);
+          await storage.delete(_domainsKey);
         }
       }
 
-      str = await storage.read(IndexKey);
+      str = await storage.read(_indexKey);
       if ((str != null && str.isNotEmpty)) {
         try {
           final list = json.decode(str);
           _hostSet = Set<String>.from(list);
         } catch (e) {
-          await storage.delete(IndexKey);
+          await storage.delete(_indexKey);
         }
       } else {
         _hostSet = <String>{};
@@ -118,8 +124,9 @@ class PersistCookieJar extends DefaultCookieJar {
         .cast<String, Map<String, dynamic>>()
         .map((String path, Map<String, dynamic> _cookies) {
       final cookies = _cookies.map((String cookieName, dynamic cookie) {
-        if (((cookie.cookie.expires == null && cookie.cookie.maxAge == null) &&
-                persistSession) ||
+        final isSession =
+            cookie.cookie.expires == null && cookie.cookie.maxAge == null;
+        if ((isSession && persistSession) ||
             (persistSession && !cookie.isExpired())) {
           return MapEntry<String, SerializableCookie>(cookieName, cookie);
         } else {
@@ -146,13 +153,13 @@ class PersistCookieJar extends DefaultCookieJar {
     await super.delete(uri, withDomainSharedCookie);
     final host = uri.host;
     if (_hostSet.remove(host)) {
-      await storage.write(IndexKey, json.encode(_hostSet.toList()));
+      await storage.write(_indexKey, json.encode(_hostSet.toList()));
     }
 
     await storage.delete(host);
 
     if (withDomainSharedCookie) {
-      await storage.write(DomainsKey, json.encode(domainCookies));
+      await storage.write(_domainsKey, json.encode(domainCookies));
     }
   }
 
@@ -161,7 +168,8 @@ class PersistCookieJar extends DefaultCookieJar {
   Future<void> deleteAll() async {
     await _checkInitialized();
     await super.deleteAll();
-    var keys = _hostSet.toList(growable: true)..addAll([IndexKey, DomainsKey]);
+    final keys = _hostSet.toList(growable: true)
+      ..addAll([_indexKey, _domainsKey]);
     await storage.deleteAll(keys);
     _hostSet.clear();
   }
@@ -171,7 +179,7 @@ class PersistCookieJar extends DefaultCookieJar {
 
     if (!_hostSet.contains(host)) {
       _hostSet.add(host);
-      await storage.write(IndexKey, json.encode(_hostSet.toList()));
+      await storage.write(_indexKey, json.encode(_hostSet.toList()));
     }
     final cookies = hostCookies[host];
 
@@ -180,23 +188,23 @@ class PersistCookieJar extends DefaultCookieJar {
     }
 
     if (withDomainSharedCookie) {
-      var filterDomainCookies =
+      final filterDomainCookies =
           domainCookies.map((key, value) => MapEntry(key, _filter(value)));
-      await storage.write(DomainsKey, json.encode(filterDomainCookies));
+      await storage.write(_domainsKey, json.encode(filterDomainCookies));
     }
   }
 
   Future<void> _load(Uri uri) async {
     final host = uri.host;
     if (_hostSet.contains(host) && hostCookies[host] == null) {
-      var str = await storage.read(host);
+      final str = await storage.read(host);
 
       if (str != null && str.isNotEmpty) {
-        Map<String, Map<String, dynamic>>? cookies;
+        Map<String, Map<String, dynamic>> cookies;
         try {
           cookies = json.decode(str).cast<String, Map<String, dynamic>>();
 
-          cookies!.forEach((String path, Map<String, dynamic> map) {
+          cookies.forEach((String path, Map<String, dynamic> map) {
             map.forEach((String k, dynamic v) {
               map[k] = SerializableCookie.fromJson(v);
             });

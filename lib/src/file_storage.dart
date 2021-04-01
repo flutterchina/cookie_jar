@@ -6,10 +6,12 @@ import 'stroage.dart';
 ///Save cookies in  files
 
 class FileStorage implements Storage {
-  FileStorage([this._dir]);
+  FileStorage([this.dir]);
 
-  /// [_dir]: where the cookie files saved in, it must be a directory path.
-  String? _dir;
+  /// [dir]: where the cookie files saved in, it must be a directory path.
+  final String? dir;
+
+  late String _curDir;
 
   String? Function(Uint8List list)? readPreHandler;
 
@@ -17,7 +19,7 @@ class FileStorage implements Storage {
 
   @override
   Future<void> delete(String key) async {
-    final file = File('$_dir$key');
+    final file = File('$_curDir$key');
     if (file.existsSync()) {
       await file.delete(recursive: true);
     }
@@ -25,22 +27,22 @@ class FileStorage implements Storage {
 
   @override
   Future<void> deleteAll(List<String> keys) async {
-    await Directory(_dir!).delete(recursive: true);
+    await Directory(_curDir).delete(recursive: true);
   }
 
   @override
   Future<void> init(bool persistSession, bool ignoreExpires) async {
-    _dir = _dir ?? './.cookies/';
-    if (!_dir!.endsWith('/')) {
-      _dir = _dir! + '/';
+    _curDir = dir ?? './.cookies/';
+    if (!_curDir.endsWith('/')) {
+      _curDir = _curDir + '/';
     }
-    _dir = _dir! + 'ie${ignoreExpires ? 1 : 0}_ps${persistSession ? 1 : 0}/';
+    _curDir = _curDir + 'ie${ignoreExpires ? 1 : 0}_ps${persistSession ? 1 : 0}/';
     await _makeCookieDir();
   }
 
   @override
   Future<String?> read(String key) async {
-    final file = File('$_dir$key');
+    final file = File('$_curDir$key');
     if (file.existsSync()) {
       if (readPreHandler != null) {
         return readPreHandler!(await file.readAsBytes());
@@ -54,7 +56,7 @@ class FileStorage implements Storage {
   @override
   Future<void> write(String key, String value) async {
     await _makeCookieDir();
-    final file = File('$_dir$key');
+    final file = File('$_curDir$key');
     if (writePreHandler != null) {
       await file.writeAsBytes(writePreHandler!(value));
     } else {
@@ -63,7 +65,7 @@ class FileStorage implements Storage {
   }
 
   Future<void> _makeCookieDir() async {
-    final directory = Directory(_dir!);
+    final directory = Directory(_curDir);
     if (!directory.existsSync()) {
       await directory.create(recursive: true);
     }

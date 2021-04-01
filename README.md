@@ -1,6 +1,5 @@
 # CookieJar
 
-[![build statud](https://img.shields.io/travis/flutterchina/cookie_jar/master.svg?style=flat-square)](https://travis-ci.org/flutterchina/cookie_jar)
 [![Pub](https://img.shields.io/pub/v/cookie_jar.svg?style=flat-square)](https://pub.dartlang.org/packages/cookie_jar)
 [![support](https://img.shields.io/badge/platform-flutter%7Cdart%20vm-ff69b4.svg?style=flat-square)](https://github.com/flutterchina/cookie_jar)
 
@@ -10,7 +9,7 @@ A cookie manager for http requests in Dart, by which you can deal with the compl
 
 ```yaml
 dependencies:
-  cookie_jar: 3.0.0
+  cookie_jar: 3.0.1
 ```
 
 ## Usage
@@ -120,7 +119,7 @@ main() async {
   dio.interceptors.add(CookieManager(cookieJar));
   await dio.get("https://baidu.com/");
   // Print cookies
-  print(cookieJar.loadForRequest(Uri.parse("https://baidu.com/")));
+  print(await cookieJar.loadForRequest(Uri.parse("https://baidu.com/")));
   // second request with the cookie
   await dio.get("https://baidu.com/");
 }

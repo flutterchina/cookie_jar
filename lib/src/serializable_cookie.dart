@@ -9,7 +9,6 @@ class SerializableCookie {
   }
 
   /// Create a instance form Json string.
-
   SerializableCookie.fromJson(String value) {
     final t = value.split(';_crt=');
     cookie = Cookie.fromSetCookieValue(t[0]);
@@ -28,8 +27,8 @@ class SerializableCookie {
   }
 
   /// Serialize the Json string.
-
   String toJson() => toString();
+
   late Cookie cookie;
 
   int createTimeStamp = 0;

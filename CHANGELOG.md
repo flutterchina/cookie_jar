@@ -1,4 +1,8 @@
 
+## 3.0.1
+
+- refactor
+
 ## 3.0.0
 
 - Change all APIs to async
