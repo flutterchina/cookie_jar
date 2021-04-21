@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'default_cookie_jar.dart';
 import 'serializable_cookie.dart';
-import 'stroage.dart';
+import 'storage.dart';
 import 'file_storage.dart';
 
 /// [PersistCookieJar] is a cookie manager which implements the standard
