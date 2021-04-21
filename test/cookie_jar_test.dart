@@ -80,7 +80,7 @@ void main() async {
       final cj = PersistCookieJar(storage: FileStorage('./test/cookies'));
       await cj.saveFromResponse(Uri.parse('https://www.baidu.com/xx'), cookies);
       var results =
-          await await cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
+          await cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
       expect(results.length, 2);
       results =
           await cj.loadForRequest(Uri.parse('https://www.baidu.com/xx/dd'));
