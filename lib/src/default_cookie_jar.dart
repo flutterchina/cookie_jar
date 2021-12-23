@@ -36,6 +36,46 @@ class DefaultCookieJar implements CookieJar {
   Map<String, Map<String, Map<String, SerializableCookie>>> get hostCookies =>
       _cookies[1];
 
+
+  /// if you set Path=/docs, these request paths match:
+  ///     /docs
+  ///     /docs/
+  ///     /docs/Web/
+  ///     /docs/Web/HTTP
+  /// But these request paths don't:
+  ///     /
+  ///     /docsets
+  ///     /fr/docs
+  bool _isPathMatch(String urlPath, String cookiePath) {
+    final urlPathLowerCase = urlPath.toLowerCase();
+    final cookiePathLowerCase = cookiePath.toLowerCase();
+    if ('/' == cookiePath || urlPathLowerCase == cookiePathLowerCase) {
+      return true;
+    }
+    if (urlPathLowerCase.startsWith(cookiePathLowerCase)) {
+      final temp = urlPathLowerCase.substring(cookiePathLowerCase.length);
+      return temp.startsWith('/');
+    }
+    return false;
+  }
+
+  /// if you set Domain=.mozilla.org, these request domains match:
+  ///     mozilla.org
+  ///     developer.mozilla.org
+  /// But these request domains don't:
+  ///     fakemozilla.org
+  ///     mozilla.org.com
+  bool _isDomainMatch(String urlDomain, String cookieDomain) {
+    if (urlDomain == cookieDomain) {
+      return true;
+    }
+    if (urlDomain.endsWith(cookieDomain)) {
+      final temp = urlDomain.substring(0, urlDomain.length - cookieDomain.length);
+      return temp.endsWith('.');
+    }
+    return false;
+  }
+
   @override
   Future<List<Cookie>> loadForRequest(Uri uri) async {
     final list = <Cookie>[];
@@ -49,7 +89,7 @@ class DefaultCookieJar implements CookieJar {
         var keys = cookies.keys.toList()
           ..sort((a, b) => b.length.compareTo(a.length));
         for (final path in keys) {
-          if (urlPath.toLowerCase().contains(path)) {
+          if (_isPathMatch(urlPath, path)) {
             final values = cookies[path]!;
             for (final key in values.keys) {
               final SerializableCookie cookie = values[key];
@@ -67,9 +107,9 @@ class DefaultCookieJar implements CookieJar {
     // Load cookies with "domain" attribute, Ignore port.
     domainCookies.forEach(
         (String domain, Map<String, Map<String, SerializableCookie>> cookies) {
-      if (uri.host.contains(domain)) {
+      if (_isDomainMatch(uri.host, domain)) {
         cookies.forEach((String path, Map<String, SerializableCookie> values) {
-          if (urlPath.toLowerCase().contains(path)) {
+          if (_isPathMatch(urlPath, path)) {
             values.forEach((String key, SerializableCookie v) {
               if (_check(uri.scheme, v)) {
                 list.add(v.cookie);
@@ -126,7 +166,7 @@ class DefaultCookieJar implements CookieJar {
     if (withDomainSharedCookie) {
       domainCookies.removeWhere(
           (String domain, Map<String, Map<String, SerializableCookie>> v) =>
-              uri.host.contains(domain));
+              _isDomainMatch(uri.host, domain));
     }
   }
 
