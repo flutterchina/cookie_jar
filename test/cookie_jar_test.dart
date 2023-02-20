@@ -55,6 +55,68 @@ void main() async {
       expect(results.length, 1);
     });
 
+    test('SharedPathCookie', () async {
+      final cj = CookieJar();
+      final cookies = <Cookie>[
+        Cookie('JSESSIONID', 'wendux')..path = '/docs',
+      ];
+      await cj.saveFromResponse(Uri.parse('http://www.mozilla.org/'), cookies);
+
+      final results1 = await cj.loadForRequest(Uri.parse('http://www.mozilla.org/docs'));
+      expect(results1.length, 1);
+
+      final results2 = await cj.loadForRequest(Uri.parse('http://www.mozilla.org/docs/'));
+      expect(results2.length, 1);
+
+      final results3 = await cj.loadForRequest(Uri.parse('http://www.mozilla.org/docs/Web'));
+      expect(results3.length, 1);
+
+      final results4 = await cj.loadForRequest(Uri.parse('http://www.mozilla.org/docs/Web/HTTP'));
+      expect(results4.length, 1);
+
+      final results5 = await cj.loadForRequest(Uri.parse('http://www.mozilla.org/docsets'));
+      expect(results5.length, 0);
+
+      final results6 = await cj.loadForRequest(Uri.parse('http://www.mozilla.org/fr/docs'));
+      expect(results6.length, 0);
+    });
+
+    test('SharedDomainCookie', () async {
+      final cj = CookieJar();
+      final cookies = <Cookie>[
+        Cookie('JSESSIONID', 'wendux')..domain = '.mozilla.org',
+      ];
+      await cj.saveFromResponse(Uri.parse('http://www.mozilla.org/'), cookies);
+
+      final results1 = await cj.loadForRequest(Uri.parse('http://mozilla.org/'));
+      expect(results1.length, 1);
+
+      final results2 = await cj.loadForRequest(Uri.parse('http://developer.mozilla.org/'));
+      expect(results2.length, 1);
+
+      final results3 = await cj.loadForRequest(Uri.parse('http://fakemozilla.org/'));
+      expect(results3.length, 0);
+
+      final results4 = await cj.loadForRequest(Uri.parse('http://mozilla.org.com/'));
+      expect(results4.length, 0);
+    });
+
+    test('DeleteDomainSharedCookie', () async {
+      final cj = CookieJar();
+      final cookies = <Cookie>[
+        Cookie('JSESSIONID', 'wendux')..domain = '.mozilla.org',
+      ];
+      await cj.saveFromResponse(Uri.parse('http://www.mozilla.org/'), cookies);
+
+      await cj.delete(Uri.parse('http://www.fakemozilla.org/'), true);
+      final results1 = await cj.loadForRequest(Uri.parse('http://www.mozilla.org/'));
+      expect(results1.length, 1);
+
+      await cj.delete(Uri.parse('http://developer.mozilla.org/'), true);
+      final results2 = await cj.loadForRequest(Uri.parse('http://www.mozilla.org/'));
+      expect(results2.length, 0);
+    });
+
     test('SharedCookiePersist', () async {
       final cj = PersistCookieJar(storage: FileStorage('./test/cookies'));
       final cookies = <Cookie>[
