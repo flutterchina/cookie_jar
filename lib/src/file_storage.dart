@@ -27,7 +27,10 @@ class FileStorage implements Storage {
 
   @override
   Future<void> deleteAll(List<String> keys) async {
-    await Directory(_curDir).delete(recursive: true);
+    final directory = Directory(_curDir);
+    if (directory.existsSync()) {
+      await directory.delete(recursive: true);
+    }
   }
 
   @override
