@@ -33,9 +33,9 @@ class DefaultCookieJar implements CookieJar {
 
   Map<String, Map<String, Map<String, SerializableCookie>>> get domainCookies =>
       _cookies[0];
+
   Map<String, Map<String, Map<String, SerializableCookie>>> get hostCookies =>
       _cookies[1];
-
 
   /// if you set Path=/docs, these request paths match:
   ///     /docs
@@ -70,7 +70,8 @@ class DefaultCookieJar implements CookieJar {
       return true;
     }
     if (urlDomain.endsWith(cookieDomain)) {
-      final temp = urlDomain.substring(0, urlDomain.length - cookieDomain.length);
+      final temp =
+          urlDomain.substring(0, urlDomain.length - cookieDomain.length);
       return temp.endsWith('.');
     }
     return false;
@@ -79,13 +80,14 @@ class DefaultCookieJar implements CookieJar {
   @override
   Future<List<Cookie>> loadForRequest(Uri uri) async {
     final list = <Cookie>[];
-    final urlPath = uri.path.isEmpty ? '/' : uri.path;
+    final urlPath = uri.path;
     // Load cookies without "domain" attribute, include port.
     final hostname = uri.host;
     for (final domain in hostCookies.keys) {
       if (hostname == domain) {
         final cookies =
             hostCookies[domain]!.cast<String, Map<String, dynamic>>();
+        // Sort by best match （child path first, parent path after）
         var keys = cookies.keys.toList()
           ..sort((a, b) => b.length.compareTo(a.length));
         for (final path in keys) {
@@ -94,10 +96,9 @@ class DefaultCookieJar implements CookieJar {
             for (final key in values.keys) {
               final SerializableCookie cookie = values[key];
               if (_check(uri.scheme, cookie)) {
-                if (list.indexWhere((e) => e.name == cookie.cookie.name) ==
-                    -1) {
-                  list.add(cookie.cookie);
-                }
+                // preserve cookies that with same name but in different paths when request (as Chrome);
+                // eg(in request header): Cookie: a=1;  a=2;  a=3
+                list.add(cookie.cookie);
               }
             }
           }
@@ -137,7 +138,7 @@ class DefaultCookieJar implements CookieJar {
       } else {
         index = 1;
         // Save cookies without "domain" attribute
-        path = cookie.path ?? (uri.path.isEmpty ? '/' : uri.path);
+        path = cookie.path ?? _curDir(uri.path);
         domain = uri.host;
       }
       var mapDomain =
@@ -183,6 +184,13 @@ class DefaultCookieJar implements CookieJar {
 
   bool _check(String scheme, SerializableCookie cookie) {
     return cookie.cookie.secure && scheme == 'https' || !_isExpired(cookie);
+  }
+
+  String _curDir(String path) {
+    if (path.isEmpty) return '/';
+    var list = path.split('/');
+    list.removeLast();
+    return list.join('/');
   }
 
   @override

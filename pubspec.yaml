@@ -1,6 +1,6 @@
 name: cookie_jar
 description: A cookie manager for http requests in Dart, by which you can deal with the complex cookie policy and persist cookies easily.
-version: 3.0.1
+version: 4.0.1-beta
 homepage: https://github.com/flutterchina/cookie_jar
 
 environment:
