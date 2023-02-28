@@ -14,6 +14,8 @@ dependencies:
 
 ## Usage
 
+[Migrate to 4.x](./migrate_to_4.md)
+
 A simple usage example:
 
 ```dart
@@ -49,7 +51,7 @@ var cj= CookieJar();
 `PersistCookieJar` is a cookie manager which implements the standard cookie policy declared in RFC. `PersistCookieJar`  persists the cookies in files, so if the application exit, the cookies always exist unless call `delete` explicitly. A example as follows:
 
 ```dart
-// Cookie files will be saved in files in "./cookies"
+// Cookie files will be saved in files in "./cookies/4/"
 var cj = PersistCookieJar(
     ignoreExpires:true, //save/load even cookies that have expired.
 );
@@ -62,9 +64,9 @@ var cj = PersistCookieJar(
 > Directory tempDir = await getTemporaryDirectory();
 > var tempPath = tempDir.path;
 > var cj = PersistCookieJar(
->           ignoreExpires: true,
->           storage: FileStorage(tempPath)
->         );
+>     ignoreExpires: true,
+>     storage: FileStorage(tempPath),
+> );
 > ```
 
 #### Storage

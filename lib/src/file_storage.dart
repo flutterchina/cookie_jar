@@ -35,7 +35,7 @@ class FileStorage implements Storage {
 
   @override
   Future<void> init(bool persistSession, bool ignoreExpires) async {
-    _curDir = dir ?? './.cookies/';
+    _curDir = dir ?? './.cookies/4/';
     if (!_curDir.endsWith('/')) {
       _curDir = _curDir + '/';
     }

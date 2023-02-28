@@ -18,11 +18,11 @@ class PersistCookieJar extends DefaultCookieJar {
   /// [ignoreExpires]: save/load even cookies that have expired.
   ///
   /// [storage]: Defaults to FileStorage
-  PersistCookieJar(
-      {this.persistSession = true,
-      bool ignoreExpires = false,
-      Storage? storage})
-      : super(ignoreExpires: ignoreExpires) {
+  PersistCookieJar({
+    this.persistSession = true,
+    bool ignoreExpires = false,
+    Storage? storage,
+  }) : super(ignoreExpires: ignoreExpires) {
     this.storage = storage ?? FileStorage();
   }
 
