@@ -1,11 +1,11 @@
 
-## 4.0.1-beta
-- Preserve cookies that with same name but in different paths when request (as Chrome).
-  eg(in request header): Cookie: a=1;  a=2;  a=3
+## 4.0.0
+- Preserve all cookies that with same name but in different paths when request (as Chrome acts).
+  For example, in request header, like "Cookie: a=1;  a=2;  a=3". Note: Cookies with same name will be sorted by path (longer path first) when return ( `List<Cookie>` that `loadForRequest` returned)
 - Fix path and domain match error (#30)
 - Fix#31: Use the "directory" of request-uri as default path if there is no 'Path' component in Set-Cookie line (in 3.x, used root '/', it is not standard).
-## 3.0.1
 
+## 3.0.1
 - refactor
 
 ## 3.0.0

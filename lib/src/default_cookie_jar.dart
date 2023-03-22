@@ -87,7 +87,7 @@ class DefaultCookieJar implements CookieJar {
       if (hostname == domain) {
         final cookies =
             hostCookies[domain]!.cast<String, Map<String, dynamic>>();
-        // Sort by best match （child path first, parent path after）
+        // Sort by best match （longer path first）
         var keys = cookies.keys.toList()
           ..sort((a, b) => b.length.compareTo(a.length));
         for (final path in keys) {
