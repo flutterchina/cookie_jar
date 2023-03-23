@@ -1,0 +1,17 @@
+name: Run tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [ vm, chrome ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1.3
+        with:
+          sdk: ${{ matrix.sdk }}
+      - run: dart pub get
+      - run: dart test --chain-stack-traces --platform=${{ matrix.platform }}
