@@ -18,17 +18,19 @@ class FileStorage implements Storage {
   String? Function(Uint8List list)? readPreHandler;
   List<int> Function(String value)? writePreHandler;
 
+  bool _initialized = false;
+
   @override
   Future<void> init(bool persistSession, bool ignoreExpires) async {
+    assert(!_initialized);
     // 4 indicates v4 starts to use a new path.
-    _currentDirectory = dir ?? './.cookies/4/';
-    if (!_currentDirectory.endsWith('/')) {
-      _currentDirectory = '$_currentDirectory/';
-    }
-    _currentDirectory = '${_currentDirectory}ie'
-        '${ignoreExpires ? 1 : 0}_ps'
-        '${persistSession ? 1 : 0}/';
+    final StringBuffer sb = StringBuffer(dir ?? '.cookies/4/')
+      ..write('ie${ignoreExpires ? 1 : 0}')
+      ..write('_ps${persistSession ? 1 : 0}')
+      ..write('/');
+    _currentDirectory = sb.toString();
     await _makeCookieDir();
+    _initialized = true;
   }
 
   @override
