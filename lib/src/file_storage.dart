@@ -1,6 +1,6 @@
-import 'dart:io';
 import 'dart:typed_data';
 
+import 'file/file.dart';
 import 'stroage.dart';
 
 ///Save cookies in  files
