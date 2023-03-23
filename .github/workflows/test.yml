@@ -10,7 +10,7 @@ jobs:
         platform: [ vm, chrome ]
     steps:
       - uses: actions/checkout@v3
-      - uses: dart-lang/setup-dart@v1.3
+      - uses: dart-lang/setup-dart@v1.5.0
         with:
           sdk: ${{ matrix.sdk }}
       - run: dart pub get
