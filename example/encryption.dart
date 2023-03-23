@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:cookie_jar/cookie_jar.dart';
 
 void main() async {
-  var storage = FileStorage('./example/.cookies/encryption')
+  final storage = FileStorage('./example/.cookies/encryption')
     ..readPreHandler = (Uint8List list) {
       // decrypt
       return utf8.decode(list.map<int>((e) => e ^ 2).toList());
@@ -15,10 +15,7 @@ void main() async {
       return utf8.encode(value).map<int>((e) => e ^ 2).toList();
     };
 
-  var cj = PersistCookieJar(
-    ignoreExpires: true,
-    storage: storage,
-  );
+  final cj = PersistCookieJar(ignoreExpires: true, storage: storage);
 
   final uri = Uri.parse('https://xxx.xxx.com/');
   await cj.delete(uri);

@@ -1,51 +1,56 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'stroage.dart';
+import 'storage.dart';
 
-///Save cookies in  files
-
+/// Persist [Cookies] in the host file storage.
 class FileStorage implements Storage {
   FileStorage([this.dir]);
 
-  /// [dir]: where the cookie files saved in, it must be a directory path.
+  /// Where the cookie files should be saved.
+  ///
+  /// When using the [FileStorage] in Flutter apps, use `path_provider`
+  /// to obtain available directories.
   final String? dir;
 
-  late String _curDir;
+  late final String _currentDirectory;
 
   String? Function(Uint8List list)? readPreHandler;
-
   List<int> Function(String value)? writePreHandler;
 
   @override
+  Future<void> init(bool persistSession, bool ignoreExpires) async {
+    // 4 indicates v4 starts to use a new path.
+    _currentDirectory = dir ?? './.cookies/4/';
+    if (!_currentDirectory.endsWith('/')) {
+      _currentDirectory = '$_currentDirectory/';
+    }
+    _currentDirectory = '${_currentDirectory}ie'
+        '${ignoreExpires ? 1 : 0}_ps'
+        '${persistSession ? 1 : 0}/';
+    await _makeCookieDir();
+  }
+
+  @override
   Future<void> delete(String key) async {
-    final file = File('$_curDir$key');
+    final file = File('$_currentDirectory$key');
     if (file.existsSync()) {
       await file.delete(recursive: true);
     }
   }
 
+  // TODO(EVERYONE): Remove keys since it's useless in the next major version.
   @override
   Future<void> deleteAll(List<String> keys) async {
-    final directory = Directory(_curDir);
+    final directory = Directory(_currentDirectory);
     if (directory.existsSync()) {
       await directory.delete(recursive: true);
     }
   }
 
   @override
-  Future<void> init(bool persistSession, bool ignoreExpires) async {
-    _curDir = dir ?? './.cookies/4/';
-    if (!_curDir.endsWith('/')) {
-      _curDir = _curDir + '/';
-    }
-    _curDir = _curDir + 'ie${ignoreExpires ? 1 : 0}_ps${persistSession ? 1 : 0}/';
-    await _makeCookieDir();
-  }
-
-  @override
   Future<String?> read(String key) async {
-    final file = File('$_curDir$key');
+    final file = File('$_currentDirectory$key');
     if (file.existsSync()) {
       if (readPreHandler != null) {
         return readPreHandler!(await file.readAsBytes());
@@ -59,7 +64,7 @@ class FileStorage implements Storage {
   @override
   Future<void> write(String key, String value) async {
     await _makeCookieDir();
-    final file = File('$_curDir$key');
+    final file = File('$_currentDirectory$key');
     if (writePreHandler != null) {
       await file.writeAsBytes(writePreHandler!(value));
     } else {
@@ -68,7 +73,7 @@ class FileStorage implements Storage {
   }
 
   Future<void> _makeCookieDir() async {
-    final directory = Directory(_curDir);
+    final directory = Directory(_currentDirectory);
     if (!directory.existsSync()) {
       await directory.create(recursive: true);
     }
