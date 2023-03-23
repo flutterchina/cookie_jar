@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'default_cookie_jar.dart';
 
-/// [CookieJar] is a cookie container and manager for HTTP requests。
+/// [CookieJar] is a cookie container and manager for HTTP requests.
 abstract class CookieJar {
   factory CookieJar({bool ignoreExpires = false}) {
     return DefaultCookieJar(ignoreExpires: ignoreExpires);
