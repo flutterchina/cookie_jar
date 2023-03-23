@@ -259,4 +259,17 @@ void main() async {
       expect(results.length, 0);
     });
   });
+
+  test('DefaultCookieJar stores cookies isolated', () async {
+    final uri = Uri.parse('https://www.baidu.com/xx');
+
+    final cj = DefaultCookieJar();
+    await cj.saveFromResponse(uri, cookies);
+    final results = await cj.loadForRequest(uri);
+    expect(results, isNotEmpty);
+
+    final otherCj = DefaultCookieJar();
+    final otherResults = await otherCj.loadForRequest(uri);
+    expect(otherResults, isEmpty);
+  });
 }
