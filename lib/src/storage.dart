@@ -14,6 +14,6 @@ abstract class Storage {
   /// Delete the cookie value with the given [key] in the storage.
   Future<void> delete(String key);
 
-  /// Delete
+  /// Delete all cookies in the storage (regardless the keys).
   Future<void> deleteAll(List<String> keys);
 }
