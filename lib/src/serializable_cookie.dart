@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'cookie/cookie.dart';
 
 /// This class is a wrapper for `Cookie` class.
 /// Because the `Cookie` class doesn't  support Json serialization,

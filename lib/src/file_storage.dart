@@ -1,6 +1,6 @@
-import 'dart:io';
 import 'dart:typed_data';
 
+import 'file/file.dart';
 import 'storage.dart';
 
 /// Persist [Cookies] in the host file storage.
@@ -13,16 +13,14 @@ class FileStorage implements Storage {
   /// to obtain available directories.
   final String? dir;
 
-  late final String _currentDirectory;
+  /// A storage can be used across different jars, so this cannot be final.
+  late String _currentDirectory;
 
   String? Function(Uint8List list)? readPreHandler;
   List<int> Function(String value)? writePreHandler;
 
-  bool _initialized = false;
-
   @override
   Future<void> init(bool persistSession, bool ignoreExpires) async {
-    assert(!_initialized);
     // 4 indicates v4 starts to use a new path.
     final StringBuffer sb = StringBuffer(dir ?? '.cookies/4/')
       ..write('ie${ignoreExpires ? 1 : 0}')
@@ -30,7 +28,6 @@ class FileStorage implements Storage {
       ..write('/');
     _currentDirectory = sb.toString();
     await _makeCookieDir();
-    _initialized = true;
   }
 
   @override
