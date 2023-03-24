@@ -1,4 +1,8 @@
-include: package:pedantic/analysis_options.yaml
-analyzer:
-  enable-experiment:
-    - non-nullable
+include: package:lints/recommended.yaml
+
+linter:
+  rules:
+    - curly_braces_in_flow_control_structures
+    - prefer_final_fields
+    - prefer_final_locals
+    - require_trailing_commas

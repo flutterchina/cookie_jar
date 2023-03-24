@@ -3,20 +3,25 @@ import 'cookie_jar.dart';
 import 'serializable_cookie.dart';
 
 /// [DefaultCookieJar] is a default cookie manager which implements the standard
-/// cookie policy declared in RFC. [DefaultCookieJar] saves the cookies in RAM, so if the application
-/// exit, all cookies will be cleared.
+/// cookie policy declared in RFC.
+///
+/// [DefaultCookieJar] saves the cookies in the memory, all cookies will be
+/// cleared after the app exited.
+///
+/// In order to save cookies into storages, use [PersistCookieJar] instead.
 class DefaultCookieJar implements CookieJar {
-  /// [ignoreExpires]: save/load even cookies that have expired.
   DefaultCookieJar({this.ignoreExpires = false});
 
-  /// A array to save cookies.
+  @override
+  final bool ignoreExpires;
+
+  /// An array to save cookies.
   ///
   /// [domains[0]] save the cookies with "domain" attribute.
   /// These cookie usually need to be shared among multiple domains.
   ///
   /// [domains[1]] save the cookies without "domain" attribute.
   /// These cookies are private for each host name.
-  ///
   final List<
           Map<
               String, //domain or host
@@ -37,7 +42,7 @@ class DefaultCookieJar implements CookieJar {
   Map<String, Map<String, Map<String, SerializableCookie>>> get hostCookies =>
       _cookies[1];
 
-  /// if you set Path=/docs, these request paths match:
+  /// If you set Path=/docs, these request paths match:
   ///     /docs
   ///     /docs/
   ///     /docs/Web/
@@ -59,7 +64,7 @@ class DefaultCookieJar implements CookieJar {
     return false;
   }
 
-  /// if you set Domain=.mozilla.org, these request domains match:
+  /// If you set Domain=.mozilla.org, these request domains match:
   ///     mozilla.org
   ///     developer.mozilla.org
   /// But these request domains don't:
@@ -88,7 +93,7 @@ class DefaultCookieJar implements CookieJar {
         final cookies =
             hostCookies[domain]!.cast<String, Map<String, dynamic>>();
         // Sort by best match （longer path first）
-        var keys = cookies.keys.toList()
+        final keys = cookies.keys.toList()
           ..sort((a, b) => b.length.compareTo(a.length));
         for (final path in keys) {
           if (_isPathMatch(urlPath, path)) {
@@ -107,44 +112,47 @@ class DefaultCookieJar implements CookieJar {
     }
     // Load cookies with "domain" attribute, Ignore port.
     domainCookies.forEach(
-        (String domain, Map<String, Map<String, SerializableCookie>> cookies) {
-      if (_isDomainMatch(uri.host, domain)) {
-        cookies.forEach((String path, Map<String, SerializableCookie> values) {
-          if (_isPathMatch(urlPath, path)) {
-            values.forEach((String key, SerializableCookie v) {
-              if (_check(uri.scheme, v)) {
-                list.add(v.cookie);
+      (domain, cookies) {
+        if (_isDomainMatch(uri.host, domain)) {
+          cookies.forEach(
+            (path, values) {
+              if (_isPathMatch(urlPath, path)) {
+                values.forEach((key, v) {
+                  if (_check(uri.scheme, v)) {
+                    list.add(v.cookie);
+                  }
+                });
               }
-            });
-          }
-        });
-      }
-    });
+            },
+          );
+        }
+      },
+    );
     return list;
   }
 
   @override
   Future<void> saveFromResponse(Uri uri, List<Cookie> cookies) async {
     for (final cookie in cookies) {
-      var domain = cookie.domain;
+      String? domain = cookie.domain;
       String path;
-      var index = 0;
-      // Save cookies with "domain" attribute
+      final int index;
       if (domain != null) {
+        index = 0;
+        // Save cookies with "domain" attribute.
         if (domain.startsWith('.')) {
           domain = domain.substring(1);
         }
         path = cookie.path ?? '/';
       } else {
+        // Save cookies without "domain" attribute.
         index = 1;
-        // Save cookies without "domain" attribute
-        path = cookie.path ?? _curDir(uri.path);
         domain = uri.host;
+        path = cookie.path ?? _curDir(uri.path);
       }
-      var mapDomain =
-          _cookies[index][domain] ?? <String, Map<String, dynamic>>{};
-      mapDomain = mapDomain.cast<String, Map<String, dynamic>>();
-
+      final mapDomain =
+          _cookies[index][domain]?.cast<String, Map<String, dynamic>>() ??
+              <String, Map<String, dynamic>>{};
       final map = mapDomain[path] ?? <String, dynamic>{};
       map[cookie.name] = SerializableCookie(cookie);
       if (_isExpired(map[cookie.name])) {
@@ -166,12 +174,12 @@ class DefaultCookieJar implements CookieJar {
     hostCookies.remove(host);
     if (withDomainSharedCookie) {
       domainCookies.removeWhere(
-          (String domain, Map<String, Map<String, SerializableCookie>> v) =>
-              _isDomainMatch(uri.host, domain));
+        (domain, v) => _isDomainMatch(uri.host, domain),
+      );
     }
   }
 
-  /// Delete all cookies in RAM
+  /// Delete all cookies stored in the memory.
   @override
   Future<void> deleteAll() async {
     domainCookies.clear();
@@ -187,12 +195,10 @@ class DefaultCookieJar implements CookieJar {
   }
 
   String _curDir(String path) {
-    if (path.isEmpty) return '/';
-    var list = path.split('/');
-    list.removeLast();
+    if (path.isEmpty) {
+      return '/';
+    }
+    final list = path.split('/')..removeLast();
     return list.join('/');
   }
-
-  @override
-  final bool ignoreExpires;
 }
