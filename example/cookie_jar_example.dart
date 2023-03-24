@@ -18,7 +18,7 @@ void main() async {
   final cj = PersistCookieJar(storage: FileStorage('./example/.cookies'));
 
   await cj.saveFromResponse(Uri.parse('https://www.baidu.com/xx'), cookies);
-  var results = await cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
+  List<Cookie> results = await cj.loadForRequest(Uri.parse('https://www.baidu.com/xx'));
   assert(results.length == 2);
   results = await cj.loadForRequest(Uri.parse('https://www.baidu.com/xx/dd'));
   assert(results.length == 2);

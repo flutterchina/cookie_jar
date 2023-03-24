@@ -1,81 +1,112 @@
 # CookieJar
 
-[![Pub](https://img.shields.io/pub/v/cookie_jar.svg?style=flat-square)](https://pub.dartlang.org/packages/cookie_jar)
-[![support](https://img.shields.io/badge/platform-flutter%7Cdart%20vm-ff69b4.svg?style=flat-square)](https://github.com/flutterchina/cookie_jar)
+[![Pub](https://img.shields.io/pub/v/cookie_jar.svg?style=flat-square)](https://pub.dev/packages/cookie_jar)
+[![GitHub license](https://img.shields.io/github/license/flutterchina/cookie_jar)](https://github.com/flutterchina/cookie_jar/blob/main/LICENSE)
 
-A cookie manager for http requests in Dart, by which you can deal with the complex cookie policy and persist cookies easily.
+A cookie manager for http requests in Dart, help you to deal with the cookie policies and persistence.
+
+## Get started
+
+> Checkout the [Migration Guide](migration_guide.md) for breaking changes between versions.
 
 ### Add dependency
 
-```yaml
-dependencies:
-  cookie_jar: 4.0.0
+You can use the command to add dio as a dependency with the latest stable version:
+
+```console
+$ dart pub add cookie_jar
 ```
 
-## Usage
+Or you can manually add cookie_jar into the dependencies section in your pubspec.yaml:
 
-[Migrate to 4.x](./migrate_to_4.md)
+```yaml
+dependencies:
+  cookie_jar: ^replace-with-latest-version
+```
+
+The latest version is: ![Pub](https://img.shields.io/pub/v/cookie_jar.svg)
+The latest version including pre-releases is: ![Pub](https://img.shields.io/pub/v/cookie_jar?include_prereleases)
+
+## Usage
 
 A simple usage example:
 
 ```dart
 import 'package:cookie_jar/cookie_jar.dart';
+
 void main() async {
-  List<Cookie> cookies = [Cookie("name", "wendux"),Cookie("location", "china")];
-  var cj = CookieJar();
-  //Save cookies   
-  await cj.saveFromResponse(Uri.parse("https://www.baidu.com/"), cookies);
-  //Get cookies  
-  List<Cookie> results = await cj.loadForRequest(Uri.parse("https://www.baidu.com/xx"));
-  print(results);  
-}    
-       
+  final cookieJar = CookieJar();
+  List<Cookie> cookies = [Cookie('name', 'wendux'), Cookie('location', 'china')];
+  // Saving cookies.
+  await cookieJar.saveFromResponse(Uri.parse('https://pub.dev/'), cookies);
+  // Obtain cookies.
+  List<Cookie> results = await cookieJar.loadForRequest(Uri.parse('https://pub.dev/paths'));
+  print(results);
+}
 ```
 
 ## Classes
 
 ### `SerializableCookie`
 
-This class is a wrapper for `Cookie` class. Because the `Cookie` class doesn't  support Json serialization, for the sake of persistence, we use this class instead of it.
+This class is a wrapper for `Cookie` class.
+Because the `Cookie` class doesn't support Json serialization,
+for the sake of persistence, we use this class instead of it.
 
 ### `CookieJar`
 
-`CookieJar` is a default cookie manager which implements the standard cookie policy declared in RFC. CookieJar saves the cookies in **RAM**, so if the application exit, all cookies will be cleared. A example as follow:
+`CookieJar` is a cookie container and manager for HTTP requests.
+
+#### `DefaultCookieJar`
+
+`DefaultCookieJar` is a default cookie manager which implements the standard cookie policy declared in RFC.
+It saves the cookies in the memory, all cookies will be cleared after the app exited.
+
+To use it:
 
 ```dart
-var cj= CookieJar();
+
+final cookieJar = CookieJar();
 ```
 
 ### `PersistCookieJar`
 
-`PersistCookieJar` is a cookie manager which implements the standard cookie policy declared in RFC. `PersistCookieJar`  persists the cookies in files, so if the application exit, the cookies always exist unless call `delete` explicitly. A example as follows:
+`PersistCookieJar` is a cookie manager which implements the standard cookie policy declared in RFC.
+`PersistCookieJar` persists the cookies in files,
+so if the application exit, the cookies always exist unless call `delete` explicitly.
+
+To use it:
 
 ```dart
 // Cookie files will be saved in files in "./cookies/4/"
-var cj = PersistCookieJar(
-    ignoreExpires:true, //save/load even cookies that have expired.
+final cookieJar = PersistCookieJar(
+  ignoreExpires: true, // Save/load even cookies that have expired.
 );
 ```
 
-> **Note**: In Flutter, File system is different from PC,  you can use [path_provider](https://pub.dartlang.org/packages/path_provider) package to get the path :
->
-> ```dart
-> // API `getTemporaryDirectory` is from "path_provider" package.
-> Directory tempDir = await getTemporaryDirectory();
-> var tempPath = tempDir.path;
-> var cj = PersistCookieJar(
->     ignoreExpires: true,
->     storage: FileStorage(tempPath),
-> );
-> ```
+> **Note**: When using the [FileStorage] in Flutter apps,
+> use [path_provider](https://pub.dev/packages/path_provider) to obtain available directories.
+
+```dart
+
+Directory tempDir = await
+
+getTemporaryDirectory();
+
+final tempPath = tempDir.path;
+final cookieJar = PersistCookieJar(
+  ignoreExpires: true,
+  storage: FileStorage(tempPath),
+);
+```
 
 #### Storage
 
-Now, You can customize your own storage，for more details refer to the implementation of `FileStorage` 
+You can customize your own storage by extending `Storage`, see `FileStorage` for more details.
 
 ## APIs
 
-**Future<void>  saveFromResponse(Uri uri, List<Cookie> cookies);**
+**Future<void> saveFromResponse(Uri uri, List<Cookie> cookies);**
 
 Save the cookies for specified uri.
 
@@ -83,64 +114,67 @@ Save the cookies for specified uri.
 
 Load the cookies for specified uri.
 
-**Future<void> delete(Uri uri,[bool withDomainSharedCookie = false] )**
+**Future<void> delete(Uri uri, [bool withDomainSharedCookie = false])**
 
-Delete cookies for specified `uri`. This API will delete all cookies for the `uri.host`, it will ignored the `uri.path`.
+Delete cookies for specified `uri`.
+This API will delete all cookies for the `uri.host`,
+it will ignore the `uri.path`.
 
-If `withDomainSharedCookie` is `true `  ,  will delete the domain-shared cookies.
+If `withDomainSharedCookie` is `true `,
+all domain-shared cookies will be deleted.
 
 **Future<void> deleteAll();**
 
-Delete all cookies 。
+Delete all cookies.
 
 ## Working with `HttpClient`
 
-Using  `CookieJar` or `PersistCookieJar` manages  `HttpClient ` 's  request/response cookies is very easy:
+Using `CookieJar` or `PersistCookieJar` manages
+`HttpClient `'s request/response cookies is quite easy:
 
 ```dart
-var cj=CookieJar();
-...
+final cookieJar = CookieJar();
 request = await httpClient.openUrl(options.method, uri);
 request.cookies.addAll(await cj.loadForRequest(uri));
 response = await request.close();
-await cj.saveFromResponse(uri, response.cookies);
+await cookieJar.saveFromResponse(uri, response.cookies);
 ```
 
 ## Working with dio
 
-[dio](https://github.com/flutterchina/dio) is a powerful Http client for Dart, which supports Interceptors, Global configuration, FormData, File downloading, Timeout etc.  And [dio](https://github.com/flutterchina/dio) supports to manage cookies with cookie_jar, the simple example is:
+[dio](https://github.com/cfug/dio) is a powerful HTTP client for Dart/Flutter,
+which supports global configuration, interceptors, FormData, request cancellation,
+file uploading/downloading, timeout, and custom adapters etc.
+dio also supports to manage cookies with `cookie_jar`
+using [dio_cookie_manager](https://pub.dev/packages/dio_cookie_manager).
+For example:
 
 ```dart
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 
-main() async {
-  var dio = Dio();
-  var cookieJar=CookieJar();
+void main() async {
+  final dio = Dio();
+  final cookieJar = CookieJar();
   dio.interceptors.add(CookieManager(cookieJar));
-  await dio.get("https://baidu.com/");
+  await dio.get('https://pub.dev/');
   // Print cookies
-  print(await cookieJar.loadForRequest(Uri.parse("https://baidu.com/")));
-  // second request with the cookie
-  await dio.get("https://baidu.com/");
+  print(await cookieJar.loadForRequest(Uri.parse('https://pub.dev/')));
+  // Another request with the cookie.
+  await dio.get("https://pub.dev/");
 }
 ```
 
-> Note: cookieJar 3.0 need:
->
-> - dio version >= 4.0
-> - dio_cookie_manager >= 3.0
-
-More details about [dio](https://github.com/flutterchina/dio)  see : https://github.com/flutterchina/dio .
+More details about [dio](https://github.com/flutterchina/dio).
 
 ## Copyright & License
 
-This open source project authorized by https://flutterchina.club , and the license is MIT.
+The project and it's underlying projects
+are originally authored by
+[@wendux](https://github.com/wendux)
+with the organization
+[@flutterchina](https://github.com/flutterchina)
+since 2018.
 
-## Features and bugs
-
-Please file feature requests and bugs at the [issue tracker][tracker].
-
-[tracker]: https://github.com/flutterchina/cookie_jar
-
+The project consents [the MIT license](LICENSE).

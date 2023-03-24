@@ -24,9 +24,9 @@ void main() async {
   group('read and save', () {
     test('DefaultCookieJar', () async {
       final cj = CookieJar();
-      var domain = 'https://aa.com';
+      String domain = 'https://aa.com';
       await cj.saveFromResponse(Uri.parse('$domain/a'), cookies);
-      var results = await cj.loadForRequest(Uri.parse('$domain/a'));
+      List<Cookie> results = await cj.loadForRequest(Uri.parse('$domain/a'));
       expect(results.length, 2);
       results = await cj.loadForRequest(Uri.parse('$domain/a/b'));
       expect(results.length, 2);
@@ -50,9 +50,9 @@ void main() async {
 
       //same key exists in different path
       domain = 'https://cc.com';
-      await cj.saveFromResponse(Uri.parse('$domain'), [Cookie('a', '1')]);
+      await cj.saveFromResponse(Uri.parse(domain), [Cookie('a', '1')]);
       await cj.saveFromResponse(Uri.parse('$domain/a/b'), [Cookie('a', '2')]);
-      results = await cj.loadForRequest(Uri.parse('$domain'));
+      results = await cj.loadForRequest(Uri.parse(domain));
       expect(results.length, 1);
       expect(results.first.value, '1');
       results = await cj.loadForRequest(Uri.parse('$domain/a/b'));
@@ -74,14 +74,14 @@ void main() async {
       });
     });
     test('PersistCookieJar', () async {
-      var domain = 'https://aa.com';
+      final domain = 'https://aa.com';
       // write
       final pcj = PersistCookieJar(storage: FileStorage('./test/cookies'));
       await pcj.saveFromResponse(Uri.parse('$domain/a'), cookies);
 
       // read
       final cj = PersistCookieJar(storage: FileStorage('./test/cookies'));
-      var results = await cj.loadForRequest(Uri.parse('$domain/a'));
+      List<Cookie> results = await cj.loadForRequest(Uri.parse('$domain/a'));
       expect(results.length, 2);
       results = await cj.loadForRequest(Uri.parse('$domain/a/b'));
       expect(results.length, 2);
@@ -97,7 +97,9 @@ void main() async {
         Cookie('location', 'china')..domain = 'qq.com',
       ];
       await cj.saveFromResponse(
-          Uri.parse('https://www.facebook.com/tt'), cookies);
+        Uri.parse('https://www.facebook.com/tt'),
+        cookies,
+      );
       final results =
           await cj.loadForRequest(Uri.parse('https://tt.facebook.com/xxx'));
       expect(results.length, 1);
@@ -184,8 +186,10 @@ void main() async {
         Cookie('location', 'china')..domain = 'qq.com',
       ];
       await cj.saveFromResponse(
-          Uri.parse('https://www.facebook.com/tt'), cookies);
-      var results =
+        Uri.parse('https://www.facebook.com/tt'),
+        cookies,
+      );
+      List<Cookie> results =
           await cj.loadForRequest(Uri.parse('https://tt.facebook.com/xxx'));
       expect(results.length, 1);
       await cj.delete(Uri.parse('https://www.facebook.com/'));
@@ -195,7 +199,7 @@ void main() async {
     });
 
     test('PersistCookieIgnoreExpires', () async {
-      var cj = PersistCookieJar(
+      PersistCookieJar cj = PersistCookieJar(
         ignoreExpires: true,
         storage: FileStorage('./test/cookies'),
       );
@@ -219,7 +223,7 @@ void main() async {
     });
 
     test('encryption', () async {
-      var storage = FileStorage('./test/cookies/encryption')
+      final storage = FileStorage('./test/cookies/encryption')
         ..readPreHandler = (Uint8List list) {
           return utf8.decode(list.map<int>((e) => e ^ 2).toList());
         }
@@ -227,7 +231,7 @@ void main() async {
           return utf8.encode(value).map<int>((e) => e ^ 2).toList();
         };
 
-      var cj = PersistCookieJar(
+      PersistCookieJar cj = PersistCookieJar(
         ignoreExpires: true,
         storage: storage,
       );
