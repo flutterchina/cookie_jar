@@ -3,6 +3,7 @@
 ## 4.0.1
 
 - Clean codes and update documents.
+- Support to compile on Web.
 
 ## 4.0.0
 
