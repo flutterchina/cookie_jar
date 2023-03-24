@@ -11,8 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1.5.0
-        with:
-          sdk: ${{ matrix.sdk }}
       - run: dart pub get
       - run: dart analyze --fatal-infos
       - run: dart test --chain-stack-traces --platform=${{ matrix.platform }}
