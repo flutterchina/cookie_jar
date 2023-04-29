@@ -1,10 +1,11 @@
 import 'dart:convert';
 
-import 'cookie/cookie.dart';
+import 'package:universal_io/io.dart' show Cookie;
+
 import 'default_cookie_jar.dart';
+import 'file_storage.dart';
 import 'serializable_cookie.dart';
 import 'storage.dart';
-import 'file_storage.dart';
 
 /// [PersistCookieJar] is a cookie manager which implements
 /// the standard cookie policy declared in RFC.

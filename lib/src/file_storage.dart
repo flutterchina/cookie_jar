@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
-import 'file/file.dart';
+import 'package:universal_io/io.dart' show Directory, File;
+
 import 'storage.dart';
 
 /// Persist [Cookies] in the host file storage.

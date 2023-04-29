@@ -1,4 +1,4 @@
-import 'cookie/cookie.dart';
+import 'package:universal_io/io.dart' show Cookie;
 
 import 'default_cookie_jar.dart';
 

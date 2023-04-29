@@ -7,6 +7,9 @@ issue_tracker: https://github.com/flutterchina/cookie_jar/issues
 environment:
   sdk: '>=2.12.0 <3.0.0'
 
+dependencies:
+  universal_io: ^2.2.0
+
 dev_dependencies:
   lints: any
   test: ^1.16.3
