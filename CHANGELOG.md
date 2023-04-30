@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 4.0.2
+
+- Use `universal_io` to handle imports.
+  This also bumps the minimum required SDK version to `2.15.0`.
+
 ## 4.0.1
 
 - Clean codes and update documents.
