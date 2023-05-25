@@ -24,21 +24,24 @@ class DefaultCookieJar implements CookieJar {
   /// [domains[1]] save the cookies without "domain" attribute.
   /// These cookies are private for each host name.
   final List<
-      Map<
-          String, //domain or host
           Map<
-              String, //path
+              String, //domain or host
               Map<
-                  String, //cookie name
-                  SerializableCookie //cookie
-                  >>>> _cookies = <Map<String, Map<String, Map<String, SerializableCookie>>>>[
+                  String, //path
+                  Map<
+                      String, //cookie name
+                      SerializableCookie //cookie
+                      >>>> _cookies =
+      <Map<String, Map<String, Map<String, SerializableCookie>>>>[
     <String, Map<String, Map<String, SerializableCookie>>>{},
     <String, Map<String, Map<String, SerializableCookie>>>{}
   ];
 
-  Map<String, Map<String, Map<String, SerializableCookie>>> get domainCookies => _cookies[0];
+  Map<String, Map<String, Map<String, SerializableCookie>>> get domainCookies =>
+      _cookies[0];
 
-  Map<String, Map<String, Map<String, SerializableCookie>>> get hostCookies => _cookies[1];
+  Map<String, Map<String, Map<String, SerializableCookie>>> get hostCookies =>
+      _cookies[1];
 
   /// If you set Path=/docs, these request paths match:
   ///     /docs
@@ -57,7 +60,8 @@ class DefaultCookieJar implements CookieJar {
     }
     if (urlPathLowerCase.startsWith(cookiePathLowerCase)) {
       final temp = urlPathLowerCase
-          .substring(cookiePathLowerCase.endsWith('/') ? cookiePathLowerCase.length - 1 : cookiePathLowerCase.length);
+          .substring(cookiePathLowerCase.endsWith('/') ?
+      cookiePathLowerCase.length - 1 : cookiePathLowerCase.length,);
       return temp.startsWith('/');
     }
     return false;
@@ -74,7 +78,8 @@ class DefaultCookieJar implements CookieJar {
       return true;
     }
     if (urlDomain.endsWith(cookieDomain)) {
-      final temp = urlDomain.substring(0, urlDomain.length - cookieDomain.length);
+      final temp =
+          urlDomain.substring(0, urlDomain.length - cookieDomain.length);
       return temp.endsWith('.');
     }
     return false;
@@ -88,9 +93,11 @@ class DefaultCookieJar implements CookieJar {
     final hostname = uri.host;
     for (final domain in hostCookies.keys) {
       if (hostname == domain) {
-        final cookies = hostCookies[domain]!.cast<String, Map<String, dynamic>>();
+        final cookies =
+            hostCookies[domain]!.cast<String, Map<String, dynamic>>();
         // Sort by best match （longer path first）
-        final keys = cookies.keys.toList()..sort((a, b) => b.length.compareTo(a.length));
+        final keys = cookies.keys.toList()
+          ..sort((a, b) => b.length.compareTo(a.length));
         for (final path in keys) {
           if (_isPathMatch(urlPath, path)) {
             final values = cookies[path]!;
@@ -147,14 +154,16 @@ class DefaultCookieJar implements CookieJar {
         path = cookie.path ?? _curDir(uri.path);
       }
       final mapDomain =
-          _cookies[index][domain]?.cast<String, Map<String, dynamic>>() ?? <String, Map<String, dynamic>>{};
+          _cookies[index][domain]?.cast<String, Map<String, dynamic>>() ??
+              <String, Map<String, dynamic>>{};
       final map = mapDomain[path] ?? <String, dynamic>{};
       map[cookie.name] = SerializableCookie(cookie);
       if (_isExpired(map[cookie.name])) {
         map.remove(cookie.name);
       }
       mapDomain[path] = map.cast<String, SerializableCookie>();
-      _cookies[index][domain] = mapDomain.cast<String, Map<String, SerializableCookie>>();
+      _cookies[index][domain] =
+          mapDomain.cast<String, Map<String, SerializableCookie>>();
     }
   }
 
