@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.0.3
+
+- Fix runtime type cast exception.
+
 ## 4.0.2
 
 - Use `universal_io` to handle imports.
