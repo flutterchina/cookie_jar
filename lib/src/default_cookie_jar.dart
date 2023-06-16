@@ -61,8 +61,8 @@ class DefaultCookieJar implements CookieJar {
     if (urlPathLowerCase.startsWith(cookiePathLowerCase)) {
       final temp = urlPathLowerCase.substring(
         cookiePathLowerCase.endsWith('/')
-          ? cookiePathLowerCase.length - 1
-          : cookiePathLowerCase.length,
+            ? cookiePathLowerCase.length - 1
+            : cookiePathLowerCase.length,
       );
       return temp.startsWith('/');
     }
