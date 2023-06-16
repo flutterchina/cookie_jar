@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.0.4
+
+- Export `Cookie` from `universal_io`.
+
 ## 4.0.3
 
 - Fix runtime type cast exception.
