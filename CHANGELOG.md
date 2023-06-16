@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.0.5
+
+- Fixed problem with returning false if cookiePath end with '/'.
+
 ## 4.0.4
 
 - Export `Cookie` from `universal_io`.
