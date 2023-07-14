@@ -1,7 +1,7 @@
 import 'package:universal_io/io.dart' show Cookie;
 
-import 'cookie_jar.dart';
-import 'serializable_cookie.dart';
+import '../cookie_jar.dart';
+import '../serializable_cookie.dart';
 
 /// [DefaultCookieJar] is a default cookie manager which implements the standard
 /// cookie policy declared in RFC.

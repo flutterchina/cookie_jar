@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.0.6
+
+- Add `WebCookieJar` to convenient Web usages instead of throwing exceptions.
+
 ## 4.0.5
 
 - Fixed problem with returning false if cookiePath end with '/'.

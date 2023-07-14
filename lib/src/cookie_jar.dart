@@ -1,6 +1,7 @@
 import 'package:universal_io/io.dart' show Cookie;
 
-import 'default_cookie_jar.dart';
+import 'jar/default.dart';
+import 'jar/web.dart';
 
 const _kIsWeb = bool.hasEnvironment('dart.library.js_util')
     ? bool.fromEnvironment('dart.library.js_util')
@@ -10,7 +11,7 @@ const _kIsWeb = bool.hasEnvironment('dart.library.js_util')
 abstract class CookieJar {
   factory CookieJar({bool ignoreExpires = false}) {
     if (_kIsWeb) {
-      throw UnimplementedError();
+      return WebCookieJar();
     }
     return DefaultCookieJar(ignoreExpires: ignoreExpires);
   }
