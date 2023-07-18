@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:meta/meta.dart';
 import 'package:universal_io/io.dart' show Directory, File;
 
 import 'storage.dart';
@@ -16,6 +17,10 @@ class FileStorage implements Storage {
 
   /// A storage can be used across different jars, so this cannot be final.
   late String _currentDirectory;
+
+  /// {@nodoc}
+  @visibleForTesting
+  String get currentDirectory => _currentDirectory;
 
   String? Function(Uint8List list)? readPreHandler;
   List<int> Function(String value)? writePreHandler;
