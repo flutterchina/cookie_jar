@@ -2,6 +2,7 @@
 
 ## 4.0.7
 
+- Allow to configure whether to delete host cookies when load failed.
 - Fix directory parsing for the file storage.
 - Add `WebCookieJar` to convenient Web usages instead of throwing exceptions.
 
