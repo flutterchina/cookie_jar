@@ -279,11 +279,13 @@ void main() async {
       final s2 = FileStorage('./test/cookies/');
       final s3 = FileStorage('/test/cookies');
       final s4 = FileStorage('/test/cookies/');
+      // Silence s3 and s4 because those directories
+      // won't have permission to create.
       await Future.wait([
         s1.init(true, false),
         s2.init(true, false),
-        s3.init(true, false),
-        s4.init(true, false),
+        s3.init(true, false).catchError((_) {}),
+        s4.init(true, false).catchError((_) {}),
       ]);
       expect(s1.currentDirectory, 'test/cookies/ie0_ps1/');
       expect(s2.currentDirectory, 'test/cookies/ie0_ps1/');
