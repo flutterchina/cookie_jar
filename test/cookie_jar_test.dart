@@ -143,22 +143,22 @@ void main() async {
       final cookies = <Cookie>[
         Cookie('JSESSIONID', 'wendux')..domain = '.mozilla.org',
       ];
-      await cj.saveFromResponse(Uri.parse('http://www.mozilla.org/'), cookies);
+      await cj.saveFromResponse(Uri.parse('https://www.mozilla.org/'), cookies);
 
       final results1 =
-          await cj.loadForRequest(Uri.parse('http://mozilla.org/'));
+          await cj.loadForRequest(Uri.parse('https://mozilla.org/'));
       expect(results1.length, 1);
 
       final results2 =
-          await cj.loadForRequest(Uri.parse('http://developer.mozilla.org/'));
+          await cj.loadForRequest(Uri.parse('https://developer.mozilla.org/'));
       expect(results2.length, 1);
 
       final results3 =
-          await cj.loadForRequest(Uri.parse('http://fakemozilla.org/'));
+          await cj.loadForRequest(Uri.parse('https://fakemozilla.org/'));
       expect(results3.length, 0);
 
       final results4 =
-          await cj.loadForRequest(Uri.parse('http://mozilla.org.com/'));
+          await cj.loadForRequest(Uri.parse('https://mozilla.org.com/'));
       expect(results4.length, 0);
     });
 
@@ -167,16 +167,16 @@ void main() async {
       final cookies = <Cookie>[
         Cookie('JSESSIONID', 'wendux')..domain = '.mozilla.org',
       ];
-      await cj.saveFromResponse(Uri.parse('http://www.mozilla.org/'), cookies);
+      await cj.saveFromResponse(Uri.parse('https://www.mozilla.org/'), cookies);
 
-      await cj.delete(Uri.parse('http://www.fakemozilla.org/'), true);
+      await cj.delete(Uri.parse('https://www.fakemozilla.org/'), true);
       final results1 =
-          await cj.loadForRequest(Uri.parse('http://www.mozilla.org/'));
+          await cj.loadForRequest(Uri.parse('https://www.mozilla.org/'));
       expect(results1.length, 1);
 
-      await cj.delete(Uri.parse('http://developer.mozilla.org/'), true);
+      await cj.delete(Uri.parse('https://developer.mozilla.org/'), true);
       final results2 =
-          await cj.loadForRequest(Uri.parse('http://www.mozilla.org/'));
+          await cj.loadForRequest(Uri.parse('https://www.mozilla.org/'));
       expect(results2.length, 0);
     });
 
@@ -271,5 +271,26 @@ void main() async {
     final otherCj = DefaultCookieJar();
     final otherResults = await otherCj.loadForRequest(uri);
     expect(otherResults, isEmpty);
+  });
+
+  group('FileStorage', () {
+    test('Parsed directory correctly', () async {
+      final s1 = FileStorage('./test/cookies');
+      final s2 = FileStorage('./test/cookies/');
+      final s3 = FileStorage('/test/cookies');
+      final s4 = FileStorage('/test/cookies/');
+      // Silence s3 and s4 because those directories
+      // won't have permission to create.
+      await Future.wait([
+        s1.init(true, false),
+        s2.init(true, false),
+        s3.init(true, false).catchError((_) {}),
+        s4.init(true, false).catchError((_) {}),
+      ]);
+      expect(s1.currentDirectory, 'test/cookies/ie0_ps1/');
+      expect(s2.currentDirectory, 'test/cookies/ie0_ps1/');
+      expect(s3.currentDirectory, '/test/cookies/ie0_ps1/');
+      expect(s4.currentDirectory, '/test/cookies/ie0_ps1/');
+    });
   });
 }

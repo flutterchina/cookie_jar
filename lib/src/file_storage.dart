@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:meta/meta.dart';
 import 'package:universal_io/io.dart' show Directory, File;
 
 import 'storage.dart';
@@ -17,13 +18,23 @@ class FileStorage implements Storage {
   /// A storage can be used across different jars, so this cannot be final.
   late String _currentDirectory;
 
+  /// {@nodoc}
+  @visibleForTesting
+  String get currentDirectory => _currentDirectory;
+
   String? Function(Uint8List list)? readPreHandler;
   List<int> Function(String value)? writePreHandler;
 
   @override
   Future<void> init(bool persistSession, bool ignoreExpires) async {
-    // 4 indicates v4 starts to use a new path.
-    final StringBuffer sb = StringBuffer(dir ?? '.cookies/4/')
+    final String baseDir;
+    if (dir != null) {
+      baseDir = Uri.directory(dir!).toString().replaceFirst('file://', '');
+    } else {
+      // 4 indicates v4 starts to use a new path.
+      baseDir = '.cookies/4/';
+    }
+    final StringBuffer sb = StringBuffer(baseDir)
       ..write('ie${ignoreExpires ? 1 : 0}')
       ..write('_ps${persistSession ? 1 : 0}')
       ..write('/');

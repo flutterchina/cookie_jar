@@ -1,7 +1,8 @@
 # CHANGELOG
 
-## 4.0.6
+## 4.0.7
 
+- Fix directory parsing for the file storage.
 - Add `WebCookieJar` to convenient Web usages instead of throwing exceptions.
 
 ## 4.0.5
