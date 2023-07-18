@@ -1,7 +1,0 @@
-language: dart
-dart:
-# Install the latest stable release
-- dev
-dart_task:
-- dartanalyzer: true
-- test: --platform vm
