@@ -24,12 +24,14 @@ class PersistCookieJar extends DefaultCookieJar {
     this.persistSession = true,
     bool ignoreExpires = false,
     Storage? storage,
+    this.deleteHostCookiesWhenLoadFailed = true,
   })  : storage = storage ?? FileStorage(),
         super(ignoreExpires: ignoreExpires);
 
   /// Whether persisting cookies without "expires" or "max-age" attribute.
   final bool persistSession;
   final Storage storage;
+  final bool deleteHostCookiesWhenLoadFailed;
 
   static const _indexKey = '.index';
   static const _domainsKey = '.domains';
@@ -207,7 +209,9 @@ class PersistCookieJar extends DefaultCookieJar {
       hostCookies[host] =
           cookies.cast<String, Map<String, SerializableCookie>>();
     } catch (e) {
-      await storage.delete(host);
+      if (deleteHostCookiesWhenLoadFailed) {
+        await storage.delete(host);
+      }
       rethrow;
     }
   }
