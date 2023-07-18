@@ -22,8 +22,14 @@ class FileStorage implements Storage {
 
   @override
   Future<void> init(bool persistSession, bool ignoreExpires) async {
-    // 4 indicates v4 starts to use a new path.
-    final StringBuffer sb = StringBuffer(dir ?? '.cookies/4/')
+    final String baseDir;
+    if (dir != null) {
+      baseDir = Uri.directory(dir!).toString().replaceFirst('file://', '');
+    } else {
+      // 4 indicates v4 starts to use a new path.
+      baseDir = '.cookies/4/';
+    }
+    final StringBuffer sb = StringBuffer(baseDir)
       ..write('ie${ignoreExpires ? 1 : 0}')
       ..write('_ps${persistSession ? 1 : 0}')
       ..write('/');
