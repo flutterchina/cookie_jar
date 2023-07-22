@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.0.8
+
+- Simply replace `\` to `/` rather than using `Uri` when parsing a storage base directory.
+
 ## 4.0.7
 
 - Allow to configure whether to delete host cookies when load failed.

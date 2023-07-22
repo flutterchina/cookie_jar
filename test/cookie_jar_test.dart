@@ -275,22 +275,23 @@ void main() async {
 
   group('FileStorage', () {
     test('Parsed directory correctly', () async {
-      final s1 = FileStorage('./test/cookies');
-      final s2 = FileStorage('./test/cookies/');
-      final s3 = FileStorage('/test/cookies');
-      final s4 = FileStorage('/test/cookies/');
-      // Silence s3 and s4 because those directories
-      // won't have permission to create.
+      final s1 = FileStorage.test('./test/cookies');
+      final s2 = FileStorage.test('./test/cookies/');
+      final s3 = FileStorage.test('/test/cookies');
+      final s4 = FileStorage.test('/test/cookies/');
+      final s5 = FileStorage.test('C:\\.cookies');
       await Future.wait([
         s1.init(true, false),
         s2.init(true, false),
-        s3.init(true, false).catchError((_) {}),
-        s4.init(true, false).catchError((_) {}),
+        s3.init(true, false),
+        s4.init(true, false),
+        s5.init(true, false),
       ]);
-      expect(s1.currentDirectory, 'test/cookies/ie0_ps1/');
-      expect(s2.currentDirectory, 'test/cookies/ie0_ps1/');
+      expect(s1.currentDirectory, './test/cookies/ie0_ps1/');
+      expect(s2.currentDirectory, './test/cookies/ie0_ps1/');
       expect(s3.currentDirectory, '/test/cookies/ie0_ps1/');
       expect(s4.currentDirectory, '/test/cookies/ie0_ps1/');
+      expect(s5.currentDirectory, 'C:/.cookies/ie0_ps1/');
     });
   });
 }
