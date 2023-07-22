@@ -7,7 +7,10 @@ import 'storage.dart';
 
 /// Persist [Cookies] in the host file storage.
 class FileStorage implements Storage {
-  FileStorage([this.dir]);
+  FileStorage([this.dir]) : shouldCreateDirectory = true;
+
+  @visibleForTesting
+  FileStorage.test(this.dir, {this.shouldCreateDirectory = false});
 
   /// Where the cookie files should be saved.
   ///
@@ -20,6 +23,10 @@ class FileStorage implements Storage {
 
   /// {@nodoc}
   @visibleForTesting
+  final bool shouldCreateDirectory;
+
+  /// {@nodoc}
+  @visibleForTesting
   String get currentDirectory => _currentDirectory;
 
   String? Function(Uint8List list)? readPreHandler;
@@ -27,12 +34,10 @@ class FileStorage implements Storage {
 
   @override
   Future<void> init(bool persistSession, bool ignoreExpires) async {
-    final String baseDir;
-    if (dir != null) {
-      baseDir = Uri.directory(dir!).toString().replaceFirst('file://', '');
-    } else {
-      // 4 indicates v4 starts to use a new path.
-      baseDir = '.cookies/4/';
+    // 4 indicates v4 starts to use a new path.
+    String baseDir = dir?.replaceAll('\\', '/') ?? '.cookies/4/';
+    if (!baseDir.endsWith('/')) {
+      baseDir += '/';
     }
     final StringBuffer sb = StringBuffer(baseDir)
       ..write('ie${ignoreExpires ? 1 : 0}')
@@ -84,6 +89,9 @@ class FileStorage implements Storage {
   }
 
   Future<void> _makeCookieDir() async {
+    if (!shouldCreateDirectory) {
+      return;
+    }
     final directory = Directory(_currentDirectory);
     if (!directory.existsSync()) {
       await directory.create(recursive: true);
