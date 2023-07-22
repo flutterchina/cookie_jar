@@ -34,7 +34,7 @@ class DefaultCookieJar implements CookieJar {
                       >>>> _cookies =
       <Map<String, Map<String, Map<String, SerializableCookie>>>>[
     <String, Map<String, Map<String, SerializableCookie>>>{},
-    <String, Map<String, Map<String, SerializableCookie>>>{}
+    <String, Map<String, Map<String, SerializableCookie>>>{},
   ];
 
   Map<String, Map<String, Map<String, SerializableCookie>>> get domainCookies =>
