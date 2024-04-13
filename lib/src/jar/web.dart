@@ -18,4 +18,10 @@ class WebCookieJar implements CookieJar {
 
   @override
   void saveFromResponse(Uri uri, List<Cookie> cookies) {}
+
+  @override
+  void endSession() {}
+
+  @override
+  List<Cookie> loadAll() => [];
 }

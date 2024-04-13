@@ -210,7 +210,7 @@ class DefaultCookieJar implements CookieJar {
 
   @override
   void deleteWhere(bool Function(Cookie cookie) test) {
-    // Traverse all manages cookies and delete entries matching `test`.
+    // Traverse all managed cookies and delete entries matching `test`.
     for (final group in _cookies) {
       for (final domainPair in group.values) {
         for (final pathPair in domainPair.values) {
@@ -218,5 +218,29 @@ class DefaultCookieJar implements CookieJar {
         }
       }
     }
+  }
+
+  @override
+  void endSession() {
+    deleteWhere((cookie) {
+      return cookie.expires == null && cookie.maxAge == null;
+    });
+  }
+
+  @override
+  FutureOr<List<Cookie>> loadAll() {
+    final list = <Cookie>[];
+
+    for (final group in _cookies) {
+      for (final domainPair in group.values) {
+        for (final pathPair in domainPair.values) {
+          for (final value in pathPair.values) {
+            list.add(value.cookie);
+          }
+        }
+      }
+    }
+
+    return list;
   }
 }

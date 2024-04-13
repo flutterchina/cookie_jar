@@ -275,6 +275,25 @@ void main() async {
     expect(otherResults, isEmpty);
   });
 
+  test('Delete session cookies', () async {
+    final cj = CookieJar();
+    await cj.saveFromResponse(
+      Uri(host: 'example.com', path: '/'),
+      cookies,
+    );
+    await cj.saveFromResponse(
+      Uri(host: 'mozilla.org', path: '/'),
+      cookiesExpired,
+    );
+
+    var results = await cj.loadAll();
+    expect(results, hasLength(4));
+
+    await cj.endSession();
+    results = await cj.loadAll();
+    expect(results, hasLength(2));
+  });
+
   group('FileStorage', () {
     test('Parsed directory correctly', () async {
       final s1 = FileStorage.test('./test/cookies');

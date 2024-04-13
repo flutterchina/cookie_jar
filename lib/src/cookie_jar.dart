@@ -24,9 +24,33 @@ abstract class CookieJar {
   /// Load the cookies for specified [uri].
   FutureOr<List<Cookie>> loadForRequest(Uri uri);
 
-  /// Delete all cookies in the [CookieJar].
+  /// Ends the current session deleting all session cookies.
+  FutureOr<void> endSession();
+
+  /// Loads all cookies in the jar.
+  ///
+  /// User agents SHOULD provide users with a mechanism for managing the cookies stored in the cookie jar.
+  /// https://www.rfc-editor.org/rfc/rfc6265.html#section-7.2
+  ///
+  /// Implementing this method is optional. It must be documented if the
+  /// implementer does not support this operation.
+  FutureOr<List<Cookie>> loadAll();
+
+  /// Deletes all cookies in the jar.
+  ///
+  /// User agents SHOULD provide users with a mechanism for managing the cookies stored in the cookie jar.
+  /// https://www.rfc-editor.org/rfc/rfc6265.html#section-7.2
+  ///
+  /// Implementing this method is optional. It must be documented if the
+  /// implementer does not support this operation.
   FutureOr<void> deleteAll();
 
-  /// Removes all cookies in this jar that satisfy the given [test].
+  /// Removes all cookies in this store that satisfy the given [test].
+  ///
+  /// User agents SHOULD provide users with a mechanism for managing the cookies stored in the cookie store.
+  /// https://www.rfc-editor.org/rfc/rfc6265.html#section-7.2
+  ///
+  /// Implementing this method is optional. It must be documented if the
+  /// implementer does not support this operation.
   FutureOr<void> deleteWhere(bool Function(Cookie cookie) test);
 }
