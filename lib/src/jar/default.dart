@@ -15,7 +15,6 @@ import '../serializable_cookie.dart';
 class DefaultCookieJar implements CookieJar {
   DefaultCookieJar({this.ignoreExpires = false});
 
-  @override
   final bool ignoreExpires;
 
   /// An array to save cookies.
@@ -175,7 +174,7 @@ class DefaultCookieJar implements CookieJar {
   /// This API will delete all cookies for the `uri.host`, it will ignored the `uri.path`.
   ///
   /// [withDomainSharedCookie] `true` will delete the domain-shared cookies.
-  @override
+  @Deprecated('Use deleteWhere instead')
   FutureOr<void> delete(Uri uri, [bool withDomainSharedCookie = false]) {
     final host = uri.host;
     hostCookies.remove(host);
@@ -207,5 +206,17 @@ class DefaultCookieJar implements CookieJar {
     }
     final list = path.split('/')..removeLast();
     return list.join('/');
+  }
+
+  @override
+  void deleteWhere(bool Function(Cookie cookie) test) {
+    // Traverse all manages cookies and delete entries matching `test`.
+    for (final group in _cookies) {
+      for (final domainPair in group.values) {
+        for (final pathPair in domainPair.values) {
+          pathPair.removeWhere((key, value) => test(value.cookie));
+        }
+      }
+    }
   }
 }

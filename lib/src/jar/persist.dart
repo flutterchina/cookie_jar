@@ -161,6 +161,15 @@ class PersistCookieJar extends DefaultCookieJar {
     }
   }
 
+  @override
+  Future<void> deleteWhere(bool Function(Cookie cookie) test) async {
+    await _checkInitialized();
+    super.deleteWhere(test);
+
+    await storage.write(_indexKey, json.encode(_hostSet.toList()));
+    await storage.write(_domainsKey, json.encode(domainCookies));
+  }
+
   /// Delete all cookies files in the [storage] and the memory.
   @override
   Future<void> deleteAll() async {

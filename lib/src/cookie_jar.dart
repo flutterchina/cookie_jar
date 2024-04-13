@@ -18,9 +18,6 @@ abstract class CookieJar {
     return DefaultCookieJar(ignoreExpires: ignoreExpires);
   }
 
-  /// Whether the [CookieJar] should ignore expired cookies during saves/loads.
-  final bool ignoreExpires = false;
-
   /// Save the [cookies] for specified [uri].
   FutureOr<void> saveFromResponse(Uri uri, List<Cookie> cookies);
 
@@ -30,6 +27,6 @@ abstract class CookieJar {
   /// Delete all cookies in the [CookieJar].
   FutureOr<void> deleteAll();
 
-  /// Delete cookies with the specified [uri].
-  FutureOr<void> delete(Uri uri, [bool withDomainSharedCookie = false]);
+  /// Removes all cookies in this jar that satisfy the given [test].
+  FutureOr<void> deleteWhere(bool Function(Cookie cookie) test);
 }
