@@ -10,6 +10,38 @@ When new content need to be added to the migration guide, make sure they're foll
 
 ## Breaking versions
 
+# NEXT
+
+Version 5.0 brings a few refinements to the `CookieJar` interface.
+Breaking changes include:
+
+- Usage of `FutureOr` in interfaces.
+  Going forward a CookieJar can also return synchronously. If every call is 
+  properly awaited nothing should break.
+  Usage in an `unawaited` method is no longer possible. The `WebCookieJar` has
+  been migrated to always complete synchronously.
+
+- Changing cookie deletion:
+  To allow implementers further flexibility the `delete` method has been removed
+  from the `CookieJar` interface. Users should migrate to the more flexible 
+  `deleteWhere` method:
+  ```dart
+  final jar = CookieJar();
+  // Check what cookies you want to have deleted.
+  jar.deleteWhere((cookie) {
+    cookie.domain == 'example.com' || cookie.name == 'cookie1';
+  }));
+  ```
+
+- Optional cookie management interface:
+  Cookie management interfaces like `deleteAll`, `deleteWhere` or `loadAll` have
+  been made optional. It is up to the implementer to support these operations.
+  Consult your implementers documentation.
+
+- Optional extra cookie parameters:
+  When loading cookies in any way from the store (`loadForRequest`, `deleteWhere` or `loadAll`)
+  implementers only have to provide the `Cookie.name` and `Cookie.value` attributes.
+
 - [4.0.0](#400)
 
 # 4.0.0
