@@ -10,7 +10,7 @@ import 'default.dart';
 /// [PersistCookieJar] is a cookie manager which implements
 /// the standard cookie policy declared in RFC.
 /// [PersistCookieJar]  persists the cookies in files, if the application exit,
-/// the cookies always exist unless user explicitly called [delete].
+/// the cookies always exist unless user explicitly deleted with [deleteWhere].
 class PersistCookieJar extends DefaultCookieJar {
   /// [persistSession] is whether persisting the cookies that without
   /// "expires" or "max-age" attribute.
@@ -147,6 +147,7 @@ class PersistCookieJar extends DefaultCookieJar {
   /// This API will delete all cookies for the `uri.host`, it will ignored the `uri.path`.
   ///
   /// [withDomainSharedCookie] `true` will delete the domain-shared cookies.
+  @Deprecated('Use deleteWhere instead')
   @override
   Future<void> delete(Uri uri, [bool withDomainSharedCookie = false]) async {
     await _checkInitialized();

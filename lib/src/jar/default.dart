@@ -12,6 +12,11 @@ import '../serializable_cookie.dart';
 /// cleared after the app exited.
 ///
 /// In order to save cookies into storages, use [PersistCookieJar] instead.
+///
+/// ### Public suffix validation
+/// This cookie jar implementation does not validate the cookie domain against a
+/// public suffix list:
+/// {@macro CookieJar.publicSuffix}
 class DefaultCookieJar implements CookieJar {
   DefaultCookieJar({this.ignoreExpires = false});
 

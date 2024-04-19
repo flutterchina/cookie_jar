@@ -195,6 +195,7 @@ void main() async {
       List<Cookie> results =
           await cj.loadForRequest(Uri.parse('https://tt.facebook.com/xxx'));
       expect(results.length, 1);
+      // ignore: deprecated_member_use_from_same_package
       await cj.delete(Uri.parse('https://www.facebook.com/'));
       results =
           await cj.loadForRequest(Uri.parse('https://tt.facebook.com/xxx'));
@@ -207,6 +208,7 @@ void main() async {
         storage: FileStorage('./test/cookies'),
       );
       final uri = Uri.parse('https://xxx.com/');
+      // ignore: deprecated_member_use_from_same_package
       await cj.delete(uri);
 
       List<Cookie> results;
@@ -240,6 +242,7 @@ void main() async {
       );
 
       final uri = Uri.parse('https://xxx.xxx.com/');
+      // ignore: deprecated_member_use_from_same_package
       await cj.delete(uri);
       List<Cookie> results;
       final cookie = Cookie('test', 'hh')
