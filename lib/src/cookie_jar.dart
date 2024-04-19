@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:universal_io/io.dart' show Cookie;
 
 import 'jar/default.dart';
@@ -20,14 +22,14 @@ abstract class CookieJar {
   final bool ignoreExpires = false;
 
   /// Save the [cookies] for specified [uri].
-  Future<void> saveFromResponse(Uri uri, List<Cookie> cookies);
+  FutureOr<void> saveFromResponse(Uri uri, List<Cookie> cookies);
 
   /// Load the cookies for specified [uri].
-  Future<List<Cookie>> loadForRequest(Uri uri);
+  FutureOr<List<Cookie>> loadForRequest(Uri uri);
 
   /// Delete all cookies in the [CookieJar].
-  Future<void> deleteAll();
+  FutureOr<void> deleteAll();
 
   /// Delete cookies with the specified [uri].
-  Future<void> delete(Uri uri, [bool withDomainSharedCookie = false]);
+  FutureOr<void> delete(Uri uri, [bool withDomainSharedCookie = false]);
 }

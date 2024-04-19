@@ -11,14 +11,14 @@ class WebCookieJar implements CookieJar {
   final bool ignoreExpires;
 
   @override
-  Future<void> delete(Uri uri, [bool withDomainSharedCookie = false]) async {}
+  void delete(Uri uri, [bool withDomainSharedCookie = false]) {}
 
   @override
-  Future<void> deleteAll() async {}
+  void deleteAll() {}
 
   @override
-  Future<List<Cookie>> loadForRequest(Uri uri) async => [];
+  List<Cookie> loadForRequest(Uri uri) => [];
 
   @override
-  Future<void> saveFromResponse(Uri uri, List<Cookie> cookies) async {}
+  void saveFromResponse(Uri uri, List<Cookie> cookies) {}
 }
