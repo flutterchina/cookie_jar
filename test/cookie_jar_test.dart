@@ -319,17 +319,22 @@ void main() async {
       expect(results.any((c) => c.name == 'persistent_cookie'), true);
 
       // Verify values
-      final sessionCookie = results.firstWhere((c) => c.name == 'session_cookie');
+      final sessionCookie =
+          results.firstWhere((c) => c.name == 'session_cookie');
       expect(sessionCookie.value, 'session_value');
 
-      final anotherSession = results.firstWhere((c) => c.name == 'another_session');
+      final anotherSession =
+          results.firstWhere((c) => c.name == 'another_session');
       expect(anotherSession.value, 'another_value');
 
-      final persistentCookie = results.firstWhere((c) => c.name == 'persistent_cookie');
+      final persistentCookie =
+          results.firstWhere((c) => c.name == 'persistent_cookie');
       expect(persistentCookie.value, 'persistent_value');
     });
 
-    test('PersistCookieJar does not persist session cookies when `persistSession` is false', () async {
+    test(
+        'PersistCookieJar does not persist session cookies when `persistSession` is false',
+        () async {
       final uri = Uri.parse('https://session-test.com/');
 
       // Create session cookies (no expires or maxAge)

@@ -126,23 +126,32 @@ class PersistCookieJar extends DefaultCookieJar {
   ) {
     return domain.cast<String, Map<String, dynamic>>().map(
       (path, cookies) {
-        return MapEntry(path, Map.fromEntries(_filterPathEntries(cookies.cast<String, SerializableCookie>())));
+        return MapEntry(
+          path,
+          Map.fromEntries(
+            _filterPathEntries(
+              cookies.cast<String, SerializableCookie>(),
+            ),
+          ),
+        );
       },
     );
   }
 
-  Iterable<MapEntry<String, SerializableCookie>> _filterPathEntries(Map<String, SerializableCookie> cookies) sync* {
+  Iterable<MapEntry<String, SerializableCookie>> _filterPathEntries(
+    Map<String, SerializableCookie> cookies,
+  ) sync* {
     for (final entry in cookies.entries) {
       final cookie = entry.value;
 
-      final isSession = cookie.cookie.expires == null && cookie.cookie.maxAge == null;
+      final isSession =
+          cookie.cookie.expires == null && cookie.cookie.maxAge == null;
       if (isSession && !persistSession) continue;
       if (cookie.isExpired()) continue;
 
       yield entry;
     }
   }
-
 
   /// Delete cookies for specified [uri].
   /// This API will delete all cookies for the `uri.host`, it will ignored the `uri.path`.
