@@ -273,6 +273,111 @@ void main() async {
     expect(otherResults, isEmpty);
   });
 
+  group('Test session cookies persistance', () {
+    test('PersistCookieJar persists session cookies by default', () async {
+      final uri = Uri.parse('https://session-default-test.com/');
+
+      // Create session cookies (no expires or maxAge)
+      final sessionCookies = <Cookie>[
+        Cookie('session_cookie', 'session_value'),
+        Cookie('another_session', 'another_value'),
+      ];
+
+      // Create non-session cookies (with expires)
+      final persistentCookies = <Cookie>[
+        Cookie('persistent_cookie', 'persistent_value')
+          ..expires = DateTime.now().add(const Duration(days: 1)),
+      ];
+
+      // Mix of session and persistent cookies
+      final mixedCookies = <Cookie>[
+        ...sessionCookies,
+        ...persistentCookies,
+      ];
+
+      // Test with default persistSession (should be true)
+      PersistCookieJar cj = PersistCookieJar(
+        storage: FileStorage('./test/cookies/session_default_test'),
+      );
+
+      await cj.delete(uri);
+      await cj.saveFromResponse(uri, mixedCookies);
+
+      // Create a new instance to verify persistence
+      cj = PersistCookieJar(
+        storage: FileStorage('./test/cookies/session_default_test'),
+      );
+
+      final results = await cj.loadForRequest(uri);
+
+      // All cookies (session and persistent) should be loaded
+      expect(results.length, 3);
+
+      // Verify all cookies are present
+      expect(results.any((c) => c.name == 'session_cookie'), true);
+      expect(results.any((c) => c.name == 'another_session'), true);
+      expect(results.any((c) => c.name == 'persistent_cookie'), true);
+
+      // Verify values
+      final sessionCookie = results.firstWhere((c) => c.name == 'session_cookie');
+      expect(sessionCookie.value, 'session_value');
+
+      final anotherSession = results.firstWhere((c) => c.name == 'another_session');
+      expect(anotherSession.value, 'another_value');
+
+      final persistentCookie = results.firstWhere((c) => c.name == 'persistent_cookie');
+      expect(persistentCookie.value, 'persistent_value');
+    });
+
+    test('PersistCookieJar does not persist session cookies when `persistSession` is false', () async {
+      final uri = Uri.parse('https://session-test.com/');
+
+      // Create session cookies (no expires or maxAge)
+      final sessionCookies = <Cookie>[
+        Cookie('session_cookie', 'session_value'),
+        Cookie('another_session', 'another_value'),
+      ];
+
+      // Create non-session cookies (with expires)
+      final persistentCookies = <Cookie>[
+        Cookie('persistent_cookie', 'persistent_value')
+          ..expires = DateTime.now().add(const Duration(days: 1)),
+      ];
+
+      // Mix of session and persistent cookies
+      final mixedCookies = <Cookie>[
+        ...sessionCookies,
+        ...persistentCookies,
+      ];
+
+      // Test with persistSession = false
+      PersistCookieJar cj = PersistCookieJar(
+        persistSession: false,
+        storage: FileStorage('./test/cookies/session_test'),
+      );
+
+      await cj.delete(uri);
+      await cj.saveFromResponse(uri, mixedCookies);
+
+      // Create a new instance to verify persistence
+      cj = PersistCookieJar(
+        persistSession: false,
+        storage: FileStorage('./test/cookies/session_test'),
+      );
+
+      final results = await cj.loadForRequest(uri);
+
+      // Only persistent cookies should be loaded
+      expect(results.length, 1);
+      expect(results[0].name, 'persistent_cookie');
+      expect(results[0].value, 'persistent_value');
+
+      // Verify session cookies are not present
+      expect(results.any((c) => c.name == 'session_cookie'), false);
+      expect(results.any((c) => c.name == 'another_session'), false);
+    });
+  });
+
   group('FileStorage', () {
     test('Parsed directory correctly', () async {
       final s1 = FileStorage.test('./test/cookies');
