@@ -1,4 +1,6 @@
 @TestOn('vm')
+library cookie_jar_test;
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
