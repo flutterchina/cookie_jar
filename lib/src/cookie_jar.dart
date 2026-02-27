@@ -28,7 +28,8 @@ const _kIsWeb = bool.hasEnvironment('dart.library.js_util')
 ///
 /// ### Public suffix validation
 /// The default implementation does not validate the cookie domain against a public
-/// suffix list:
+/// suffix list.
+/// {@template CookieJar.publicSuffixNote}
 /// > NOTE: A "public suffix" is a domain that is controlled by a public
 /// > registry, such as "com", "co.uk", and "pvt.k12.wy.us". This step is
 /// > essential for preventing attacker.com from disrupting the integrity of
@@ -36,6 +37,7 @@ const _kIsWeb = bool.hasEnvironment('dart.library.js_util')
 /// > Unfortunately, the set of public suffixes (also known as "registry controlled domains")
 /// > changes over time. If feasible, user agents SHOULD use an up-to-date
 /// > public suffix list, such as the one maintained by the Mozilla project at <http://publicsuffix.org/>.
+/// {@endtemplate}
 ///
 /// ### CookieJar limits and eviction policy
 /// If a cookie jar has a limit to the number of cookies it can store,

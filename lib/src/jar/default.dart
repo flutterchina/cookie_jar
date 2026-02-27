@@ -15,8 +15,8 @@ import '../serializable_cookie.dart';
 ///
 /// ### Public suffix validation
 /// This cookie jar implementation does not validate the cookie domain against a
-/// public suffix list:
-/// {@macro CookieJar.publicSuffix}
+/// public suffix list.
+/// {@macro CookieJar.publicSuffixNote}
 class DefaultCookieJar implements CookieJar {
   DefaultCookieJar({this.ignoreExpires = false});
 
