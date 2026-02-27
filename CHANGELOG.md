@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.0.9
+
+- Fix `persistSession` parameter does not work as expected.
+
 ## 4.0.8
 
 - Simply replace `\` to `/` rather than using `Uri` when parsing a storage base directory.
