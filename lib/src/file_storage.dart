@@ -21,11 +21,9 @@ class FileStorage implements Storage {
   /// A storage can be used across different jars, so this cannot be final.
   late String _currentDirectory;
 
-  /// {@nodoc}
   @visibleForTesting
   final bool shouldCreateDirectory;
 
-  /// {@nodoc}
   @visibleForTesting
   String get currentDirectory => _currentDirectory;
 
