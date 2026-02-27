@@ -5,20 +5,23 @@ import '../cookie_jar.dart';
 /// A [WebCookieJar] will do nothing to handle cookies
 /// since they are already handled by XHRs.
 class WebCookieJar implements CookieJar {
-  WebCookieJar({this.ignoreExpires = false});
+  WebCookieJar();
 
   @override
-  final bool ignoreExpires;
+  void deleteWhere(bool Function(Cookie cookie) test) {}
 
   @override
-  Future<void> delete(Uri uri, [bool withDomainSharedCookie = false]) async {}
+  void deleteAll() {}
 
   @override
-  Future<void> deleteAll() async {}
+  List<Cookie> loadForRequest(Uri uri) => [];
 
   @override
-  Future<List<Cookie>> loadForRequest(Uri uri) async => [];
+  void saveFromResponse(Uri uri, List<Cookie> cookies) {}
 
   @override
-  Future<void> saveFromResponse(Uri uri, List<Cookie> cookies) async {}
+  void endSession() {}
+
+  @override
+  List<Cookie> loadAll() => [];
 }

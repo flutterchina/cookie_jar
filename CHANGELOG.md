@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## NEXT
+
+- `CookieJar` now returns `FutureOr` instead of `Future` for all methods.
+- Deprecates `delete` in favor of `deleteWhere`.
+- Adds `loadAll` to get all saved Cookies.
+- Adds `endSession` to delete all session Cookies.
+
 ## 4.0.8
 
 - Simply replace `\` to `/` rather than using `Uri` when parsing a storage base directory.

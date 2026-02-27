@@ -8,7 +8,6 @@ void main() {
   test('Constructed a WebCookieJar', () async {
     final cj = CookieJar();
     expect(cj, isA<WebCookieJar>());
-    await cj.delete(Uri());
     await cj.deleteAll();
     await cj.saveFromResponse(Uri(), []);
     final cookies = await cj.loadForRequest(Uri());

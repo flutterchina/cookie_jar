@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:universal_io/io.dart' show Cookie;
 
 import '../cookie_jar.dart';
@@ -10,10 +12,14 @@ import '../serializable_cookie.dart';
 /// cleared after the app exited.
 ///
 /// In order to save cookies into storages, use [PersistCookieJar] instead.
+///
+/// ### Public suffix validation
+/// This cookie jar implementation does not validate the cookie domain against a
+/// public suffix list.
+/// {@macro CookieJar.publicSuffixNote}
 class DefaultCookieJar implements CookieJar {
   DefaultCookieJar({this.ignoreExpires = false});
 
-  @override
   final bool ignoreExpires;
 
   /// An array to save cookies.
@@ -88,7 +94,7 @@ class DefaultCookieJar implements CookieJar {
   }
 
   @override
-  Future<List<Cookie>> loadForRequest(Uri uri) async {
+  FutureOr<List<Cookie>> loadForRequest(Uri uri) {
     final list = <Cookie>[];
     final urlPath = uri.path;
     // Load cookies without "domain" attribute, include port.
@@ -137,7 +143,7 @@ class DefaultCookieJar implements CookieJar {
   }
 
   @override
-  Future<void> saveFromResponse(Uri uri, List<Cookie> cookies) async {
+  FutureOr<void> saveFromResponse(Uri uri, List<Cookie> cookies) {
     for (final cookie in cookies) {
       String? domain = cookie.domain;
       String path;
@@ -173,8 +179,8 @@ class DefaultCookieJar implements CookieJar {
   /// This API will delete all cookies for the `uri.host`, it will ignored the `uri.path`.
   ///
   /// [withDomainSharedCookie] `true` will delete the domain-shared cookies.
-  @override
-  Future<void> delete(Uri uri, [bool withDomainSharedCookie = false]) async {
+  @Deprecated('Use deleteWhere instead')
+  FutureOr<void> delete(Uri uri, [bool withDomainSharedCookie = false]) {
     final host = uri.host;
     hostCookies.remove(host);
     if (withDomainSharedCookie) {
@@ -186,7 +192,7 @@ class DefaultCookieJar implements CookieJar {
 
   /// Delete all cookies stored in the memory.
   @override
-  Future<void> deleteAll() async {
+  FutureOr<void> deleteAll() {
     domainCookies.clear();
     hostCookies.clear();
   }
@@ -205,5 +211,41 @@ class DefaultCookieJar implements CookieJar {
     }
     final list = path.split('/')..removeLast();
     return list.join('/');
+  }
+
+  @override
+  void deleteWhere(bool Function(Cookie cookie) test) {
+    // Traverse all managed cookies and delete entries matching `test`.
+    for (final group in _cookies) {
+      for (final domainPair in group.values) {
+        for (final pathPair in domainPair.values) {
+          pathPair.removeWhere((key, value) => test(value.cookie));
+        }
+      }
+    }
+  }
+
+  @override
+  void endSession() {
+    deleteWhere((cookie) {
+      return cookie.expires == null && cookie.maxAge == null;
+    });
+  }
+
+  @override
+  FutureOr<List<Cookie>> loadAll() {
+    final list = <Cookie>[];
+
+    for (final group in _cookies) {
+      for (final domainPair in group.values) {
+        for (final pathPair in domainPair.values) {
+          for (final value in pathPair.values) {
+            list.add(value.cookie);
+          }
+        }
+      }
+    }
+
+    return list;
   }
 }

@@ -165,17 +165,19 @@ void main() async {
     });
 
     test('DeleteDomainSharedCookie', () async {
-      final cj = CookieJar();
+      final cj = DefaultCookieJar();
       final cookies = <Cookie>[
         Cookie('JSESSIONID', 'wendux')..domain = '.mozilla.org',
       ];
       await cj.saveFromResponse(Uri.parse('https://www.mozilla.org/'), cookies);
 
+      // ignore: deprecated_member_use_from_same_package
       await cj.delete(Uri.parse('https://www.fakemozilla.org/'), true);
       final results1 =
           await cj.loadForRequest(Uri.parse('https://www.mozilla.org/'));
       expect(results1.length, 1);
 
+      // ignore: deprecated_member_use_from_same_package
       await cj.delete(Uri.parse('https://developer.mozilla.org/'), true);
       final results2 =
           await cj.loadForRequest(Uri.parse('https://www.mozilla.org/'));
@@ -195,6 +197,7 @@ void main() async {
       List<Cookie> results =
           await cj.loadForRequest(Uri.parse('https://tt.facebook.com/xxx'));
       expect(results.length, 1);
+      // ignore: deprecated_member_use_from_same_package
       await cj.delete(Uri.parse('https://www.facebook.com/'));
       results =
           await cj.loadForRequest(Uri.parse('https://tt.facebook.com/xxx'));
@@ -207,6 +210,7 @@ void main() async {
         storage: FileStorage('./test/cookies'),
       );
       final uri = Uri.parse('https://xxx.com/');
+      // ignore: deprecated_member_use_from_same_package
       await cj.delete(uri);
 
       List<Cookie> results;
@@ -240,6 +244,7 @@ void main() async {
       );
 
       final uri = Uri.parse('https://xxx.xxx.com/');
+      // ignore: deprecated_member_use_from_same_package
       await cj.delete(uri);
       List<Cookie> results;
       final cookie = Cookie('test', 'hh')
@@ -273,6 +278,25 @@ void main() async {
     final otherCj = DefaultCookieJar();
     final otherResults = await otherCj.loadForRequest(uri);
     expect(otherResults, isEmpty);
+  });
+
+  test('Delete session cookies', () async {
+    final cj = CookieJar();
+    await cj.saveFromResponse(
+      Uri(host: 'example.com', path: '/'),
+      cookies,
+    );
+    await cj.saveFromResponse(
+      Uri(host: 'mozilla.org', path: '/'),
+      cookiesExpired,
+    );
+
+    var results = await cj.loadAll();
+    expect(results, hasLength(4));
+
+    await cj.endSession();
+    results = await cj.loadAll();
+    expect(results, hasLength(2));
   });
 
   group('Test session cookies persistance', () {

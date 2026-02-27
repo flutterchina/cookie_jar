@@ -17,7 +17,7 @@ void main() async {
   final cj = PersistCookieJar(ignoreExpires: true, storage: storage);
 
   final uri = Uri.parse('https://xxx.xxx.com/');
-  await cj.delete(uri);
+  await cj.deleteWhere((cookie) => cookie.domain == uri.host);
   List<Cookie> results;
   final cookie = Cookie('test', 'hh')
     ..expires = DateTime.parse('1970-02-27 13:27:00');
