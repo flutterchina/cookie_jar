@@ -1,4 +1,6 @@
 @TestOn('chrome')
+library cookie_jar_web_test;
+
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:test/test.dart';
 
