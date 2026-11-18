@@ -385,6 +385,77 @@ void main() async {
     });
   });
 
+  group('Secure cookies', () {
+    test('are only sent over https and wss', () async {
+      final cj = CookieJar();
+      await cj.saveFromResponse(Uri.parse('https://secure.com/'), [
+        Cookie('secure', '1')..secure = true,
+        Cookie('plain', '2'),
+      ]);
+
+      List<Cookie> results =
+          await cj.loadForRequest(Uri.parse('https://secure.com/'));
+      expect(results.map((c) => c.name), unorderedEquals(['secure', 'plain']));
+
+      results = await cj.loadForRequest(Uri.parse('wss://secure.com/'));
+      expect(results.map((c) => c.name), unorderedEquals(['secure', 'plain']));
+
+      results = await cj.loadForRequest(Uri.parse('http://secure.com/'));
+      expect(results.map((c) => c.name), ['plain']);
+
+      results = await cj.loadForRequest(Uri.parse('ws://secure.com/'));
+      expect(results.map((c) => c.name), ['plain']);
+    });
+
+    test('are not sent over https once expired', () async {
+      final cj = CookieJar();
+      final uri = Uri.parse('https://secure-expired.com/');
+      await cj.saveFromResponse(uri, [
+        Cookie('secure', '1')
+          ..secure = true
+          ..maxAge = 1,
+      ]);
+      expect(await cj.loadForRequest(uri), hasLength(1));
+
+      await Future<void>.delayed(const Duration(seconds: 2));
+      expect(await cj.loadForRequest(uri), isEmpty);
+    });
+
+    test('are not loaded by PersistCookieJar once expired', () async {
+      final storage = FileStorage('./test/cookies/secure_expired_test');
+      final uri = Uri.parse('https://secure-persist.com/');
+      PersistCookieJar cj = PersistCookieJar(storage: storage);
+      await cj.delete(uri);
+      await cj.saveFromResponse(uri, [
+        Cookie('secure', '1')
+          ..secure = true
+          ..maxAge = 1,
+      ]);
+
+      await Future<void>.delayed(const Duration(seconds: 2));
+      cj = PersistCookieJar(storage: storage);
+      expect(await cj.loadForRequest(uri), isEmpty);
+    });
+
+    test('are only sent over https when ignoring expires', () async {
+      final cj = DefaultCookieJar(ignoreExpires: true);
+      final expires = DateTime.parse('1970-02-27 13:27:00');
+      await cj.saveFromResponse(Uri.parse('https://secure-ignore.com/'), [
+        Cookie('secure', '1')
+          ..secure = true
+          ..expires = expires,
+        Cookie('plain', '2')..expires = expires,
+      ]);
+
+      List<Cookie> results =
+          await cj.loadForRequest(Uri.parse('https://secure-ignore.com/'));
+      expect(results.map((c) => c.name), unorderedEquals(['secure', 'plain']));
+
+      results = await cj.loadForRequest(Uri.parse('http://secure-ignore.com/'));
+      expect(results.map((c) => c.name), ['plain']);
+    });
+  });
+
   group('FileStorage', () {
     test('Parsed directory correctly', () async {
       final s1 = FileStorage.test('./test/cookies');
